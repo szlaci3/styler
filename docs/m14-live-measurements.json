@@ -1,0 +1,54 @@
+{
+  "timestampUtc": "2026-10-30T19:02:09.509Z",
+  "agent": "antigravity-preview-09-2026",
+  "mode": "inspiration",
+  "samples": [
+    {
+      "sample": 1,
+      "slot": "G3",
+      "valid": true,
+      "constraintsValid": true,
+      "capturedInspiration": "S4",
+      "liveInspiration": "S2",
+      "inspirationSnapshotValid": true,
+      "elapsedMs": 37781,
+      "requestId": "0f2f63f5-67df-4a08-a5f6-8067a0123874",
+      "usage": {
+        "total_tokens": 12490,
+        "total_input_tokens": 8129,
+        "total_cached_tokens": 0,
+        "total_output_tokens": 536,
+        "total_tool_use_tokens": 0,
+        "total_thought_tokens": 3825
+      },
+      "cost": "unavailable"
+    }
+  ],
+  "cost": "unavailable",
+  "hosting": "local only",
+  "serverReports": [
+    {
+      "requestId": "0f2f63f5-67df-4a08-a5f6-8067a0123874",
+      "agent": "antigravity-preview-09-2026",
+      "timestampUtc": "2026-10-30T19:01:31.444Z",
+      "cost": "unavailable",
+      "valid": true,
+      "httpStatus": 200,
+      "usage": {
+        "total_tokens": 12490,
+        "total_input_tokens": 8129,
+        "total_cached_tokens": 0,
+        "total_output_tokens": 536,
+        "total_tool_use_tokens": 0,
+        "total_thought_tokens": 3825
+      },
+      "validationStage": "accepted",
+      "agentConfirmed": true,
+      "completed": true,
+      "incomplete": false,
+      "interactionId": "v1_ChdrT25rYXNuZks4LWxrZFVQcUtfVWlRNBIXa09ua2FzbmZLOC1sa2RVUHFLX1VpUTQ",
+      "outcome": "success",
+      "elapsedMs": 37781
+    }
+  ]
+}

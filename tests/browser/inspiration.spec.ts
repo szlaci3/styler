@@ -1,0 +1,104 @@
+import { test, expect } from '@playwright/test';
+import { parseGenerationRequest } from '../../server/generation.ts';
+import { constrainStyle } from '../../shared/constraints.ts';
+import { seedStyle } from '../../src/styles/presets.ts';
+
+for (const width of [1280, 1440, 1920]) {
+  test(`inspiration is exclusive, independently clearable, and never selects or sends immediately at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: width === 1280 ? 720 : 900 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.clock.install();
+    let calls = 0;
+    await page.route('**/api/generate', async route => { calls++; await route.abort(); });
+    await page.goto('/');
+    await page.getByRole('textbox', { name: 'Email address' }).fill('inspiration@example.com');
+    const identity = await page.locator('.sample-page').elementHandle();
+    const preview = page.getByRole('status', { name: 'Selected style' });
+    const blueprint = page.getByRole('button', { name: 'Use S2 as inspiration', exact: true });
+    await blueprint.focus(); await page.keyboard.press('Space');
+    await expect(blueprint).toHaveAttribute('aria-pressed', 'true');
+    await expect(preview).toContainText('S1');
+    await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
+    await expect(blueprint).toHaveAttribute('aria-pressed', 'true');
+    await expect(preview).toContainText('S3');
+    const seed = page.getByRole('button', { name: 'Use G1 as inspiration', exact: true });
+    await seed.focus(); await page.keyboard.press('Enter');
+    await expect(seed).toHaveAttribute('aria-pressed', 'true');
+    await expect(blueprint).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('.inspiration-button[aria-pressed=true]')).toHaveCount(1);
+    await expect(preview).toContainText('S3');
+    await page.getByRole('button', { name: 'Clear inspiration', exact: true }).click();
+    await expect(page.locator('.inspiration-button[aria-pressed=true]')).toHaveCount(0);
+    await expect(page.getByRole('status', { name: 'Generation inspiration' })).toHaveText('No inspiration selected.');
+    await blueprint.click();
+    await page.clock.runFor(4000);
+    expect(calls).toBe(0);
+    await expect(page.getByRole('button', { name: 'Generate', exact: true })).toBeEnabled();
+    expect(await identity!.evaluate(element => element.isConnected)).toBe(true);
+    await expect(page.getByRole('textbox', { name: 'Email address' })).toHaveValue('inspiration@example.com');
+    expect(await page.evaluate(() => ({ width: document.documentElement.scrollWidth, y: window.scrollY }))).toEqual({ width, y: 0 });
+    // Restore the canvas scroll for a clear comparison of preview vs inspiration.
+    await page.getByRole('region', { name: 'Scrollable website preview', exact: true }).evaluate(element => { element.scrollTop = 0; });
+    await page.screenshot({ path: `test-results/m14-inspiration-${width}.png` });
+    await blueprint.click();
+    await expect(page.locator('.inspiration-button[aria-pressed=true]')).toHaveCount(0);
+  });
+}
+
+test('Joker, AI and retry share original inspiration despite edits; generated styles can inspire later batches', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const requests: ReturnType<typeof parseGenerationRequest>[] = [];
+  let release!: () => void;
+  await page.route('**/api/generate', async route => {
+    const request = parseGenerationRequest(route.request().postDataJSON());
+    requests.push(request);
+    if (requests.length === 1) {
+      await new Promise<void>(resolve => { release = resolve; });
+      await route.fulfill({ status: 429, json: { error: 'Quota exceeded.' } });
+    } else await route.fulfill({ json: { style: constrainStyle({ ...(request.inspiration ?? seedStyle), id: request.id, provenance: 'antigravity' }, request.snapshot) } });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Lock button background-color', exact: true }).click();
+  await page.getByRole('button', { name: 'Unset card padding-top', exact: true }).click();
+  await page.getByRole('button', { name: 'Use S4 as inspiration', exact: true }).click();
+  const generate = page.getByRole('button', { name: 'Generate', exact: true });
+  await generate.click();
+  await expect(page.locator('[data-slot="G2"] .style-card')).toBeVisible();
+  await expect.poll(() => requests.length).toBe(5);
+  const original = requests[0]!;
+  expect(original.inspiration?.id).toBe('S4');
+  expect(original.inspiration?.rules.find(rule => rule.selectorId === 'button')?.declarations.find(d => d.property === 'background-color')?.value).toBe('#ffb545');
+  expect(original.snapshot).toContainEqual({ selectorId: 'button', property: 'background-color', state: 'locked', value: '#344e41' });
+  await page.getByRole('button', { name: 'Use S2 as inspiration', exact: true }).click();
+  await page.getByRole('button', { name: 'Lock button background-color', exact: true }).click();
+  await page.locator('[data-slot="G2"] .style-card').click();
+  await expect(page.locator('.sample-page')).toHaveCSS('font-family', '"Courier New", monospace');
+  await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('background-color', 'rgb(52, 78, 65)');
+  const localCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
+  expect(localCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
+  release();
+  const retry = page.getByRole('button', { name: 'Retry G3' });
+  await expect(retry).toBeEnabled();
+  await retry.click();
+  await expect(page.locator('[data-slot="G3"] .style-card')).toBeVisible();
+  expect(requests.filter(r => r.id === 'G3')[1]).toEqual(original);
+  await expect(page.locator('[data-slot]')).toHaveCount(7);
+  await expect(page.getByRole('button', { name: 'Use S2 as inspiration', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G2');
+  await page.locator('[data-slot="G3"] .style-card').click();
+  await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('background-color', 'rgb(52, 78, 65)');
+  const aiCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
+  expect(aiCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
+  await page.getByRole('button', { name: 'Use G3 as inspiration', exact: true }).click();
+  await expect(page.locator('.inspiration-button[aria-pressed=true]')).toHaveCount(1);
+  await generate.click();
+  await expect(page.locator('[data-slot="G13"] .style-card')).toBeAttached();
+  expect(requests.find(r => r.id === 'G9')?.inspiration?.id).toBe('G3');
+  await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G3');
+  await page.getByRole('button', { name: 'Clear inspiration', exact: true }).click();
+  await generate.click();
+  await expect(page.locator('[data-slot="G19"] .style-card')).toBeAttached();
+  expect(requests.find(r => r.id === 'G15')?.inspiration).toBe(null);
+  await page.getByRole('button', { name: 'Use G2 as inspiration', exact: true }).click();
+  await expect(page.getByRole('status', { name: 'Generation inspiration' })).toHaveText('Inspiration: G2Clear inspiration');
+});

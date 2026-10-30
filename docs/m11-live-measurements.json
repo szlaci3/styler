@@ -1,0 +1,90 @@
+{
+  "timestampUtc": "2026-10-30T17:38:13.467Z",
+  "agent": "antigravity-preview-09-2026",
+  "samples": [
+    {
+      "sample": 1,
+      "slot": "G3",
+      "valid": true,
+      "constraintsValid": true,
+      "elapsedMs": 37733,
+      "requestId": "ee670026-bb63-493d-ba0f-dd1d6758cac1",
+      "usage": {
+        "total_tokens": 9933,
+        "total_input_tokens": 5369,
+        "total_cached_tokens": 0,
+        "total_output_tokens": 634,
+        "total_tool_use_tokens": 0,
+        "total_thought_tokens": 3930
+      },
+      "cost": "unavailable"
+    },
+    {
+      "sample": 2,
+      "slot": "G5",
+      "valid": true,
+      "constraintsValid": true,
+      "elapsedMs": 34818,
+      "requestId": "e45bf0c1-d7e3-4216-b99d-c6bc66cf99f4",
+      "usage": {
+        "total_tokens": 9418,
+        "total_input_tokens": 5369,
+        "total_cached_tokens": 0,
+        "total_output_tokens": 599,
+        "total_tool_use_tokens": 0,
+        "total_thought_tokens": 3450
+      },
+      "cost": "unavailable"
+    }
+  ],
+  "cost": "unavailable",
+  "hosting": "local only",
+  "serverReports": [
+    {
+      "requestId": "ee670026-bb63-493d-ba0f-dd1d6758cac1",
+      "agent": "antigravity-preview-09-2026",
+      "timestampUtc": "2026-10-30T17:37:00.614Z",
+      "cost": "unavailable",
+      "valid": true,
+      "httpStatus": 200,
+      "usage": {
+        "total_tokens": 9933,
+        "total_input_tokens": 5369,
+        "total_cached_tokens": 0,
+        "total_output_tokens": 634,
+        "total_tool_use_tokens": 0,
+        "total_thought_tokens": 3930
+      },
+      "validationStage": "accepted",
+      "agentConfirmed": true,
+      "completed": true,
+      "incomplete": false,
+      "interactionId": "v1_Chd2dFhrYXE3Y0ctLXYzYm9QakwzMjhRMBIXdnRYa2FxN2NHLS12M2JvUGpMMzI4UTA",
+      "outcome": "success",
+      "elapsedMs": 37733
+    },
+    {
+      "requestId": "e45bf0c1-d7e3-4216-b99d-c6bc66cf99f4",
+      "agent": "antigravity-preview-09-2026",
+      "timestampUtc": "2026-10-30T17:37:38.513Z",
+      "cost": "unavailable",
+      "valid": true,
+      "httpStatus": 200,
+      "usage": {
+        "total_tokens": 9418,
+        "total_input_tokens": 5369,
+        "total_cached_tokens": 0,
+        "total_output_tokens": 599,
+        "total_tool_use_tokens": 0,
+        "total_thought_tokens": 3450
+      },
+      "validationStage": "accepted",
+      "agentConfirmed": true,
+      "completed": true,
+      "incomplete": false,
+      "interactionId": "v1_Chc1TlhrYXEyN0dZX29uc0VQM196RDJBRRIXNU5Ya2FxMjdHWV9vbnNFUDNfekQyQUU",
+      "outcome": "success",
+      "elapsedMs": 34818
+    }
+  ]
+}
