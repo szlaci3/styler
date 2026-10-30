@@ -12,5 +12,5 @@
     "types": ["node", "vite/client"],
     "skipLibCheck": true
   },
-  "include": ["shared/**/*.ts", "src/**/*.ts", "src/**/*.tsx", "server/**/*.ts", "tests/**/*.ts", "vite.config.ts", "playwright.config.ts"]
+  "include": ["shared/**/*.ts", "src/**/*.ts", "src/**/*.tsx", "server/**/*.ts", "netlify/**/*.mts", "tests/**/*.ts", "vite.config.ts", "playwright.config.ts"]
 }

@@ -9,21 +9,25 @@
   "scripts": {
     "dev": "node server/dev.ts",
     "build": "npm run typecheck && vite build",
+    "build:functions": "node server/build-netlify-functions.ts",
     "test:e2e": "playwright test",
     "probe:antigravity": "node --env-file=.env server/probe-antigravity.ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/antigravity-probe.test.ts tests/style.test.ts tests/constraints.test.ts tests/joker.test.ts tests/generation.test.ts tests/generation-api.test.ts"
+    "test": "node --test tests/antigravity-probe.test.ts tests/style.test.ts tests/constraints.test.ts tests/joker.test.ts tests/generation.test.ts tests/generation-api.test.ts tests/background-jobs.test.ts"
   },
   "devDependencies": {
+    "@netlify/functions": "^6.0.3",
+    "@netlify/zip-it-and-ship-it": "^16.6.0",
     "@playwright/test": "^1.64.1",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "vite": "^8.3.5"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.7",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   }

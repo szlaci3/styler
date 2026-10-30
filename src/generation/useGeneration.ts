@@ -4,6 +4,7 @@ import type { Snapshot } from '../../shared/constraints.ts';
 import { AI_RESULTS_PER_BATCH, AI_CONCURRENCY, captureGenerationSnapshot, type GenerationSnapshot } from '../../shared/generation.ts';
 import { seedStyle } from '../styles/presets.ts';
 import { makeJoker } from './joker.ts';
+import { requestStyle } from './requestStyle.ts';
 
 export type Slot = { id: string; context: GenerationSnapshot; seed?: number; stage?: 'quick' | 'additional'; status: 'pending' | 'ready' | 'error'; style?: Style; error?: string };
 export function useGeneration() {
@@ -16,11 +17,8 @@ export function useGeneration() {
   const update = (id: string, patch: Partial<Slot>) => setSlots(old => old.map(slot => slot.id === id ? { ...slot, ...patch } : slot));
   async function remote(slot: Slot) {
     try {
-      const response = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: slot.id, snapshot: slot.context.constraints, ...(slot.context.inspiration ? { inspiration: slot.context.inspiration } : {}) }), signal: AbortSignal.timeout(100_000) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Generation failed. Retry manually.');
-      const style = parseStyle(data.style);
+      const style = parseStyle(await requestStyle({ id: slot.id, snapshot: slot.context.constraints,
+        ...(slot.context.inspiration ? { inspiration: slot.context.inspiration } : {}) }));
       if (style.id !== slot.id || style.provenance !== 'antigravity') throw new Error('Invalid generated style.');
       for (const c of slot.context.constraints) {
         const value = style.rules.find(r => r.selectorId === c.selectorId)?.declarations.find(d => d.property === c.property)?.value;

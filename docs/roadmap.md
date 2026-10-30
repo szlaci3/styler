@@ -2,6 +2,8 @@
 
 Approved by the user on 2026-10-30. M1–M18 are complete; local desktop V1 is accepted. The user explicitly authorized M5–M11 together, then M12–M18 through successive selections on 2026-10-30. The approved roadmap ends at M18. Scope changes require a product decision; implementation details do not.
 
+After M18, the user explicitly selected Netlify and authorized backend migration, then chose background generation. That follow-on source migration is implemented and locally verified; no hosted deployment has been performed. See netlify-deployment.md. The original milestone evidence below remains historical; V2 is still deferred.
+
 Every milestone ends with appropriate validation, in-scope fixes, status/decision updates, a report of working and remaining behavior, and the next recommendation. Test evidence must distinguish mocks, real provider calls, real browser checks, local builds, and deployment.
 
 ## MVP — milestones 1–12
@@ -38,4 +40,4 @@ Manual insertion of CSS declarations is out of scope. New properties would initi
 
 ## Next recommendation
 
-M1–M18 are complete. Latest acceptance and hosting/concurrency rationale are in m18-v1-acceptance.md; real-provider measurements remain in m15-live-measurements.json. Next trial the accepted local V1. Public deployment needs a separately selected target/scope; V2 remains deferred pending a product decision about custom declarations and their lifetime. No additional implementation milestone is automatically authorized. A future integration blocker does not authorize switching providers.
+M1–M18 are complete. Local V1 acceptance remains m18-v1-acceptance.md; the subsequently authorized Netlify background migration is documented in netlify-deployment.md. Real-provider measurements remain in m15-live-measurements.json. Next deploy the repository with its Functions-scoped key and verify health plus one deliberate hosted batch. V2 remains deferred pending a product decision about custom declarations and their lifetime. A future integration blocker does not authorize switching providers.
