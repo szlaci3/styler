@@ -4,13 +4,17 @@ import { useGeneration } from './generation/useGeneration.ts';
 import { useCountdown } from './generation/useCountdown.ts';
 import { presets } from './styles/presets.ts';
 import { StyleCard } from './components/StyleCard.tsx';
-import { toggleConstraint, type Snapshot } from '../shared/constraints.ts';
+import { parseSnapshot, toggleConstraint, type Snapshot } from '../shared/constraints.ts';
 import { makeInspectionGroups, representative, normalizeComputed, type InspectionGroup } from './preview/inspection.ts';
 import { Preview } from './preview/Preview.tsx';
 import { ENABLED_EXPRESSIONS } from '../shared/generation.ts';
 import { IntroductionVideo } from './components/IntroductionVideo.tsx';
+import { EditableValue, AddDeclaration, type CssEdits } from './components/CssEditing.tsx';
 
-function Inspector({ values, constraints, groups, onToggle, active, remaining, unusedConstraints, onGenerate, inspirationId, onClearInspiration }: { values: Record<string, string>; constraints: Snapshot; groups: readonly InspectionGroup[];
+function Inspector({ values, constraints, groups, edits, onEdit, onRemoveEdit, onToggle, active, remaining, unusedConstraints, onGenerate, inspirationId, onClearInspiration }: { values: Record<string, string>; constraints: Snapshot; groups: readonly InspectionGroup[];
+  edits: CssEdits;
+  onEdit: (selector: SelectorId, property: Property, value: string, added?: boolean) => void;
+  onRemoveEdit: (selector: SelectorId, property: Property) => void;
   remaining: number | null;
   unusedConstraints: boolean;
   inspirationId: string | null; onClearInspiration: () => void;
@@ -29,15 +33,25 @@ function Inspector({ values, constraints, groups, onToggle, active, remaining, u
         {groups.map(rule => (
           <div className="css-rule" key={rule.selectorId}>
             <div className="css-selector">{selectors[rule.selectorId]} <span>{'{'}</span></div>
-            <dl>{rule.properties.map(property => (
+            <dl>{rule.properties.map(property => {
+              const edit = edits[`${rule.selectorId}:${property}`];
+              return (
               <div className="css-declaration" key={property} data-declaration={`${rule.selectorId}:${property}`}>
-                <dt>{property}<span>:</span></dt><dd>{lockedValue(constraints, rule.selectorId, property) ?? values[`${rule.selectorId}:${property}`] ?? '…'}<span>;</span></dd>
-                <span className="declaration-controls">{(['locked', 'unset'] as const).map(state => <button key={state}
+                <dt className={edit?.kind === 'added' ? 'css-edited' : undefined}>{property}<span>:</span></dt>
+                <dd><EditableValue selector={rule.selectorId} property={property}
+                  value={lockedValue(constraints, rule.selectorId, property) ?? values[`${rule.selectorId}:${property}`] ?? '…'}
+                  edited={!!edit} onEdit={onEdit} /><span>;</span></dd>
+                <span className="declaration-controls">{edit ? <>
+                  <button disabled aria-label={`Lock ${rule.selectorId} ${property}`} aria-pressed="true">L</button>
+                  <button className="css-remove-edit" aria-label={`${edit.kind === 'added' ? 'Delete' : 'Reset'} ${rule.selectorId} ${property}`}
+                    onClick={() => onRemoveEdit(rule.selectorId, property)}>{edit.kind === 'added' ? 'Del' : 'Reset'}</button>
+                </> : (['locked', 'unset'] as const).map(state => <button key={state}
                   aria-label={`${state === 'locked' ? 'Lock' : 'Unset'} ${rule.selectorId} ${property}`}
                   aria-pressed={constraints.some(c => c.selectorId === rule.selectorId && c.property === property && c.state === state)}
                   onClick={() => onToggle(rule.selectorId, property, state)}>{state === 'locked' ? 'L' : 'U'}</button>)}</span>
               </div>
-            ))}</dl>
+            ); })}</dl>
+            <AddDeclaration selector={rule.selectorId} existing={rule.properties} onAdd={(selector, property, value) => onEdit(selector, property, value, true)} />
             <span className="css-brace">{'}'}</span>
           </div>
         ))}
@@ -70,7 +84,11 @@ export function App() {
   const editMayArm = useRef(false);
   // Retain discovered declaration rows for the session, so locks remain reachable
   // even after selecting a preset that omits that generated declaration.
-  const groups = useMemo(() => makeInspectionGroups(generation.slots.flatMap(slot => slot.style ? [slot.style] : [])), [generation.slots]);
+  const [edits, setEdits] = useState<CssEdits>({});
+  const groups = useMemo(() => makeInspectionGroups(generation.slots.flatMap(slot => slot.style ? [slot.style] : [])).map(group => ({
+    ...group, properties: [...new Set([...group.properties, ...Object.keys(edits)
+      .filter(key => key.startsWith(`${group.selectorId}:`)).map(key => key.split(':')[1] as Property)])],
+  })), [generation.slots, edits]);
   const generatedRail = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!generation.scrollTarget || !generatedRail.current) return;
@@ -83,7 +101,27 @@ export function App() {
   const [root, setRoot] = useState<ShadowRoot | null>(null);
   const [constraints, setConstraints] = useState<Snapshot>([]);
   const [notice, setNotice] = useState('');
+  function onEdit(selectorId: SelectorId, property: Property, value: string, added = false) {
+    const key = `${selectorId}:${property}`;
+    const next = parseSnapshot([...constraints.filter(c => c.selectorId !== selectorId || c.property !== property),
+      { selectorId, property, state: 'locked', value }]);
+    setEdits(current => ({ ...current, [key]: current[key] ?? { kind: added ? 'added' : 'changed',
+      previous: constraints.find(c => c.selectorId === selectorId && c.property === property) } }));
+    editMayArm.current = !generation.isActive();
+    setConstraints(next); setNotice('');
+  }
+  function onRemoveEdit(selectorId: SelectorId, property: Property) {
+    const key = `${selectorId}:${property}`, edit = edits[key];
+    if (!edit) return;
+    const next = constraints.filter(c => c.selectorId !== selectorId || c.property !== property);
+    if (edit.previous) next.push(edit.previous);
+    editMayArm.current = !generation.isActive();
+    setConstraints(parseSnapshot(next));
+    setEdits(current => { const copy = { ...current }; delete copy[key]; return copy; });
+    setNotice('');
+  }
   function onToggle(selector: SelectorId, property: Property, state: 'locked' | 'unset') {
+    if (edits[`${selector}:${property}`]) return;
     const element = root && representative(root, selector);
     if (!element) return;
     const value = normalizeComputed(property, getComputedStyle(element).getPropertyValue(property).trim(), element);
@@ -171,7 +209,7 @@ export function App() {
           </div>
           <footer className="rail-footer">{generation.slots.length} STYLES</footer>
         </section>
-        <Inspector groups={groups} values={values} constraints={constraints} onToggle={onToggle} active={generation.active} remaining={countdown.remaining} unusedConstraints={unusedConstraints} onGenerate={generate} inspirationId={inspirationId} onClearInspiration={() => toggleInspiration(null)} />
+        <Inspector groups={groups} edits={edits} onEdit={onEdit} onRemoveEdit={onRemoveEdit} values={values} constraints={constraints} onToggle={onToggle} active={generation.active} remaining={countdown.remaining} unusedConstraints={unusedConstraints} onGenerate={generate} inspirationId={inspirationId} onClearInspiration={() => toggleInspiration(null)} />
         {notice && <div className="app-notice" role="status">{notice}</div>}
       </main>
     </div>

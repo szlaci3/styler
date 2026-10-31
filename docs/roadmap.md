@@ -2,7 +2,7 @@
 
 Approved by the user on 2026-10-30. M1–M18 are complete; local desktop V1 is accepted. The user explicitly authorized M5–M11 together, then M12–M18 through successive selections on 2026-10-30. The approved roadmap ends at M18. Scope changes require a product decision; implementation details do not.
 
-After M18, the user explicitly selected Netlify and authorized backend migration, then chose background generation. That follow-on source migration is implemented and locally verified; no hosted deployment has been performed. See netlify-deployment.md. The original milestone evidence below remains historical; V2 is still deferred.
+After M18, the user explicitly selected Netlify and authorized backend migration, then chose background generation. That follow-on source migration is implemented and locally verified; no hosted deployment has been performed. See netlify-deployment.md. The original milestone evidence below remains historical. The user selected V2 declaration editing on 2026-10-31; its boundary is below.
 
 Every milestone ends with appropriate validation, in-scope fixes, status/decision updates, a report of working and remaining behavior, and the next recommendation. Test evidence must distinguish mocks, real provider calls, real browser checks, local builds, and deployment.
 
@@ -34,10 +34,10 @@ Every milestone ends with appropriate validation, in-scope fixes, status/decisio
 | M17 | Edits during active generation | Live locks update immediately while the batch retains its original snapshot. No active-request edit arms or queues a timer. Completion indicates constraints not yet used when appropriate, without auto-sending. Later manual generation or a fresh constraint edit works. Test race conditions and completion/error paths. |
 | M18 | V1 acceptance and measured handoff | End-to-end six-result/inspiration/timer/race journeys pass. Record observed first-result/full-batch latency, exposed usage and defensible cost or unavailable, and chosen concurrency rationale. Preserve older history, partial results, source order, reduced motion, and keyboard usability. All required checks pass and status identifies hosting decision and remaining limits. |
 
-## Deferred V2
+## V2 — declaration editing (authorized 2026-10-31)
 
-Manual insertion of CSS declarations is out of scope. New properties would initially be locked, but their lifetime remains a deliberate future product decision. Do not implement custom authoring or resolve lifetime during MVP/V1.
+The user explicitly selected V2: type changes to existing values and add declaration lines with a + control under existing selectors. This is the selected follow-on milestone, superseding the earlier deferral. Acceptance: changed values show CSS green with disabled active L / Reset; added properties and values show CSS green with disabled active L / Del. Edits behave as locks in preview and generation, persist across selection and generation for the session, and leave original styles intact. Reset restores the prior constraint; Del removes the added override. Validate within the existing shared schema and preserve countdown, snapshot and active-request race behavior. Arbitrary selectors/properties and persistence across reloads remain outside this milestone.
 
 ## Next recommendation
 
-M1–M18 are complete. Local V1 acceptance remains m18-v1-acceptance.md; the subsequently authorized Netlify background migration is documented in netlify-deployment.md. Real-provider measurements remain in m15-live-measurements.json. Next deploy the repository with its Functions-scoped key and verify health plus one deliberate hosted batch. V2 remains deferred pending a product decision about custom declarations and their lifetime. A future integration blocker does not authorize switching providers.
+M1–M18 are complete. Local V1 acceptance remains m18-v1-acceptance.md; the subsequently authorized Netlify background migration is documented in netlify-deployment.md. V2 declaration editing is the selected follow-on above. After local editing acceptance, hosted verification remains a separate next action: deploy the repository with its Functions-scoped key and verify health plus one deliberate hosted batch. A future integration blocker does not authorize switching providers.

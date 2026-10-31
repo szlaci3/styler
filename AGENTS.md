@@ -18,7 +18,7 @@ Build the desktop website style explorer described in `docs/product-specificatio
 - Unset clears a lock and constrains future output to omit a declaration; it never inserts literal CSS `unset` into the current preview.
 - MVP: manual Generate only, exactly two new cards (instant local Joker + one AI), immutable snapshot, immediate placeholders, mandatory generated-column scroll, no automatic selection.
 - Current V1 follow-on: six results in order — local Joker (±20 RGB), local Harlequin (±40 RGB), quick AI Professional, then Playful, Commercial and Artistic. Mysterious is disabled. Preserve inspiration lock, progressive delivery, shared eight-second timer and no queued generation during a request. Similar/identical AI results are acceptable.
-- V2 custom declaration authoring is deferred, including its lifetime. No mobile work, database, universal CSS editor, or elaborate orchestration.
+- V2 declaration editing is authorized: typed values and new lines under existing selectors, within the shared bounded schema. Edits auto-lock with disabled L; changed values use Reset, added lines use Del. Edited values (and added property names) use CSS green. Edits persist for the session until Reset/Del; Reset restores the preceding constraint. No mobile work, database, universal CSS editor, or elaborate orchestration.
 - No AI request on page load. Preserve history in session memory. Use explicit errors and manual retry.
 - Keep the app chrome isolated from generated CSS. Validate styles on the server and client against the bounded schema.
 

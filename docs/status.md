@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-31 (Europe/Brussels).
 
+## V2 declaration editing (2026-10-31)
+
+User-authorized V2 follow-on is complete locally. Type an existing value and press Enter or leave the field to commit; Escape cancels a draft. Edited values use CSS `green` (#008000), with active disabled L and Reset. Each existing selector has a + control for a new supported declaration; added property/value text uses the same green, with active disabled L and Del. Invalid or duplicate/unsupported declarations show inline errors without changing preview or constraints. Typed locks use the same bounded shared schema, live preview, immutable generation snapshot and eight-second countdown as normal locks. Active-request edits never queue generation.
+
+Edits persist across selections and generations until explicitly removed or reload. Reset restores the constraint preceding the first edit, including an earlier Lock or Unset. Del removes the added override; accepted generated styles retain their own immutable declarations, so a history-discovered row may remain with normal L/U controls after Del. This resolves the prior V2 lifetime deferral for session editing. Arbitrary selectors/properties and cross-session persistence remain outside scope.
+
+Validation: **39 offline checks**, **56 Edge checks passed across runs**, **build/typecheck**, and `git diff --check` pass. The full browser run passed 54/56; the focused rerun passed all five editing/inspector checks after fixing a new test's invalid sample and making the existing interpolated-weight test allow sufficient transition time before pausing. Browser assertions now read editable field values instead of static declaration text. Coverage includes green text, disabled locks, repeated typing, Reset from Free/Locked/Unset, Del, invalid input, added and changed values in captured generation inputs, preserved accepted history, selection persistence, active-request edits and no queued batch. Visual QA inspected the 1280px desktop and edited-value screenshots. The sandbox's temporary server stalled; successful Edge runs used the existing outside-sandbox test workflow, mocked generation and an empty provider key. No paid request, deployment, commit or push performed. Hosted verification remains the next separate action.
+
 ## CSS control explanations (2026-10-31)
 
 Replaced the inspector's Effective CSS / Live constraints badge row with two plain-text explanations requested by the user: “L - Locks a line, to be applied in preview and in generations.” and “U - Unsets a line, so it's not used in generations.” Each explanation starts on its own line and can wrap within the inspector. Removed the badge styling; declaration behavior is unchanged. Build/typecheck and `git diff --check` pass. No browser verification, provider request or deployment performed. This UI correction is complete; hosted verification remains a separate next action.
@@ -22,7 +30,7 @@ Created `docs/video/styler-introduction.mp4`, a 43.1-second captioned desktop de
 
 - Roadmap and architecture approved on 2026-10-30. Original requirements remain in product-specification.md.
 - User authorized M5–M11 together, then M12–M18 through successive milestone selections, including “Continue” after M17. **M1–M18 are complete: local desktop V1 has passed acceptance and measured handoff.**
-- The original roadmap ends at M18. The user subsequently authorized backend migration to Netlify and explicitly chose background generation. **The migration is implemented and locally verified; no hosted deployment has been performed.** V2 remains deferred.
+- The original roadmap ends at M18. The user subsequently authorized backend migration to Netlify and explicitly chose background generation. **The migration is implemented and locally verified; no hosted deployment has been performed.** The user authorized V2 declaration editing on 2026-10-31, superseding its earlier deferral.
 - Existing ignored GEMINI_API_KEY is authorized for integration, server-side only. Exact agent remains antigravity-preview-09-2026.
 - Follow-on request on 2026-10-31: internally copy only `.sample-card` border colors and padding into new Antigravity results from captured inspiration, with per-declaration G1 fallback. Explicit locks and Unset remain authoritative. No UI controls or Joker changes; other AI card properties remain generated. User requested commit and push to main.
 - Subsequent request on 2026-10-31: Joker takes all supported colors, including shadow colors, from captured inspiration with per-declaration G1 fallback. Each RGB channel varies independently by at most 20, clamped to 0–255; alpha stays unchanged. Locks and Unset take priority. Commit and push to main authorized.
@@ -114,8 +122,8 @@ Dev startup loads the server key without calling the provider. Live verification
 - Sustained reliability, quota capacity, wider concurrent throughput, billing rates, hosted behavior, and hosting/public access controls remain unverified. Netlify is selected and background deployment source is ready; actual deployment, real self-dispatch/Blobs/cleanup, and any site access protection remain unverified. dist is frontend-only: deploy the repository with Functions, not just the static folder.
 - History exists only in React session memory and clears on reload.
 - Computed values outside the bounded vocabulary show an explicit capture notice. No arbitrary CSS authoring.
-- Deferred V2 custom declaration lifetime remains undecided.
+- V2 declaration edits persist for the session across selection and generation until Reset/Del or reload; cross-session persistence remains outside scope.
 
 ## Next action
 
-The local reliability continuation is complete at its measured boundary: 25/25 selected-profile generations passed, including the real browser batch and pacing comparison. Next verify the selected profile on Netlify when deployment is selected: deploy the repository with Functions, configure the intended Functions-scoped key, and verify health plus a hosted batch. Local key rotation does not update hosted environment variables. No cloud action was performed here. Long-term quota capacity, larger contexts and higher concurrency remain unverified; V2 remains deferred.
+The selected V2 follow-on is bounded declaration editing; see its current acceptance evidence above. Hosted verification remains a separate next action when deployment is selected: deploy the repository with Functions, configure the intended Functions-scoped key, and verify health plus a hosted batch. Local key rotation does not update hosted environment variables. No cloud action was performed here. Long-term quota capacity, larger contexts and higher concurrency remain unverified.

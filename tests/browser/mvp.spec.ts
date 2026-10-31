@@ -86,7 +86,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     expect(aiCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
 
     const addedRow = page.locator('[data-declaration="heading:background-color"]');
-    await expect(addedRow.locator('dd')).toHaveText('rgb(221, 238, 255);');
+    await expect(addedRow.locator('input')).toHaveValue('rgb(221, 238, 255)');
     const addedLock = page.getByRole('button', { name: 'Lock heading background-color', exact: true });
     await addedLock.focus(); await page.keyboard.press('Enter');
     await page.getByRole('button', { name: 'S2: Blueprint', exact: true }).click();
@@ -94,7 +94,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     await expect(page.locator('.sample-heading')).toHaveCSS('background-color', 'rgb(221, 238, 255)');
     await addedLock.click();
     await expect(page.locator('.sample-heading')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-    await expect(addedRow.locator('dd')).toHaveText('rgba(0, 0, 0, 0);');
+    await expect(addedRow.locator('input')).toHaveValue('rgba(0, 0, 0, 0)');
     await ai.click();
     await expect(page.locator('.sample-heading')).toHaveCSS('background-color', 'rgb(221, 238, 255)');
     await expect(page.getByRole('textbox', { name: 'Email address' })).toHaveValue('acceptance@example.com');

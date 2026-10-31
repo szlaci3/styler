@@ -36,9 +36,9 @@ for (const outcome of ['success', 'partial', 'failure'] as const) {
     await page.clock.runFor(10);
     await expect.poll(() => mock.requests.length).toBe(2);
     await page.getByRole('button', { name: 'Lock button background-color', exact: true }).click();
-    const captured = await page.locator('[data-declaration="button:background-color"] dd').innerText();
+    const captured = await page.locator('[data-declaration="button:background-color"] input').inputValue();
     await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
-    await expect(page.locator('[data-declaration="button:background-color"] dd')).toHaveText(captured);
+    await expect(page.locator('[data-declaration="button:background-color"] input')).toHaveValue(captured);
     await expect(page.locator('.preview-host .sample-button').first()).toHaveCSS('background-color', 'rgb(36, 91, 99)');
     await page.getByRole('button', { name: 'Unset card padding-top', exact: true }).click();
     await page.getByRole('button', { name: 'Use S2 as inspiration', exact: true }).click();
