@@ -4,6 +4,8 @@ Last updated: 2026-10-31 (Europe/Brussels).
 
 ## Authority and scope
 
+- Latest UI correction on 2026-10-31: match card-swatch button colors to the preview when generated declarations are omitted, remove all rail captions, increase card-wrapper bottom margins to 18px, and show one centered name (S1–S7/G1) or expression (generated cards). Commit and push authorized.
+
 - Latest follow-on: introduce local Harlequin with ±40 RGB variation alongside unchanged ±20 Joker, and use the user-confirmed six-card batch: Joker, Harlequin, quick AI Professional, Playful, Commercial, Artistic. Mysterious is disabled in new batches/API calls/retries. This supersedes the earlier five-card interpretation; existing accepted history stays usable.
 
 - Roadmap and architecture approved on 2026-10-30. Original requirements remain in product-specification.md.
@@ -20,6 +22,7 @@ Last updated: 2026-10-31 (Europe/Brussels).
 ## Working implementation
 
 - Local React/TypeScript desktop app with seven immutable presets (S1 Tidal Atelier, S5 Foundation) and a selectable G1 seed, Rosewater. The expanded Form & Field preview includes local illustrations, navigation, memberships, a validated local visit form with dropdowns/notes, and native FAQs. Content/control state survives all preset changes.
+- Style-card labels show preset/seed names or generated expressions, centered below each sample; the S/G identifier stays in the sample. Captions are removed and wrappers have an 18px bottom margin. Missing button background/text colors use native ButtonFace/ButtonText in the same light color scheme as the preview; declarations remain absent and live preview locks do not change historical samples.
 - Persistent ShadowRoot preview retains DOM/control state and isolates app chrome. Selected and locks styles use native CSS layers with reduced-motion support. Enabling reduced motion cancels existing transitions as well as preventing new ones.
 - Effective inspector reads canonical rendered representatives, including inherited/default values, and retains rows discovered in accepted generated history. Conditional switch selector reads its track even when unchecked. Fractional font weights during transitions can be captured within the 400–800 bound.
 - Free/Locked/Unset controls capture browser values, retain locks across selection, and keep original style records intact. Unset clears the live lock and omits the declaration in later results.
@@ -34,6 +37,8 @@ Last updated: 2026-10-31 (Europe/Brussels).
 - Netlify configuration builds the frontend and deploys start/health, signed background worker, status and hourly-cleanup functions. Strongly consistent Blobs holds temporary job state; atomic claims prevent duplicate deliveries from repeating paid work. Provider deadline remains 90 seconds; job/polling deadline is 150 seconds. Visible history remains session-only.
 
 ## Verification
+
+2026-10-31 style-card correction: **39 offline checks**, **53 Edge checks** in one full run, **build/typecheck** and **git diff --check** pass. New mocked S3-inspired Playful checks compare swatch/preview computed background and text colors with either or both declarations Unset, including dark system preference; generated CSS still omits those declarations. Labels, caption removal and 18px spacing are covered, along with the existing selection, inspiration, keyboard, scrolling, retry and isolation checks. Visual QA inspected screenshots at 1280px and 1440px. The focused browser run required execution outside the sandbox after its temporary server stalled inside it; both the focused and full successful runs used only mocked generation and an empty provider key. No paid provider call or hosted verification occurred. This UI follow-on is complete; hosted verification remains the next separate action.
 
 2026-10-31 six-card clarification: the user confirmed **Joker + Harlequin + one quick AI + three other AI**. Artistic is enabled again; Mysterious alone stays disabled. Current order: Joker, Harlequin, Professional, Playful, Commercial, Artistic. **39 offline checks**, build/typecheck and Netlify packaging pass. All **49 Edge checks passed across runs**: 48 in the full run, with all four generation checks passing on the focused rerun after correcting an old retry-count expectation (four originals plus one retry). Coverage includes both immediate locals, exactly four AI calls, two lanes, snapshot retention, retry, countdown, race boundaries, history/scrolling and Harlequin inspiration. No paid provider calls or deployment occurred for this clarification. The earlier five-card interpretation below is superseded.
 

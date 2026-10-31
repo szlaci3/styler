@@ -38,7 +38,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2
 .rail-heading h2 { font-size: 11px; }
 .rail-heading .panel-kicker { margin-bottom: 9px; font-family: Consolas, monospace; font-size: 9px; }
 .rail-scroll { flex: 1; padding: 19px 9px 14px; display: flex; flex-direction: column; align-items: stretch; }
-.style-card-wrapper { flex-shrink: 0; margin-bottom: 8px; }
+.style-card-wrapper { flex-shrink: 0; margin-bottom: 18px; }
 .style-card { display: block; width: 100%; border-radius: 7px; padding: 4px; border: 1px solid #454d57; background: #272e38; text-align: left; }
 .style-card:hover { border-color: #b0a17d; }
 .style-card-active { border-color: #c0a366; box-shadow: 0 0 0 2px #b99a4a15; }
@@ -46,11 +46,9 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2
 .style-sample-lines { display: grid; gap: 4px; width: 100%; }
 .style-sample-lines i { display: block; height: 3px; border-radius: 2px; background: #9ea99d; width: 85%; }
 .style-sample-lines i:last-child { width: 55%; background: #d0d5c9; }
-.style-sample-button { color: white; background: #344e41; border-radius: 4px; font-size: 10px; padding: 5px 10px; }
-.style-card-id { padding: 8px 2px 3px; display: flex; flex-wrap: wrap; gap: 3px 5px; align-items: center; justify-content: space-between; font-family: Consolas, monospace; font-size: 10px; color: #e6d8b5; }
-.style-card-id > span { font-family: 'Segoe UI', sans-serif; color: #a8afba; font-size: 8px; }
-.seed-card .style-card-id { color: #bfc8d5; }
-.rail-caption { color: #9ba5b3; text-align: center; font-size: 9px; line-height: 1.6; margin: 10px 0; }
+/* Omitted colors use the native button defaults, in the preview's light scheme. */
+.style-sample-button { color-scheme: light; color: ButtonText; background-color: ButtonFace; border-radius: 4px; font-size: 10px; padding: 5px 10px; }
+.style-card-id { padding: 8px 2px 3px; display: block; text-align: center; overflow-wrap: anywhere; font-family: 'Segoe UI', Arial, sans-serif; font-size: 10px; line-height: 1.4; color: #a8afba; }
 .rail-bottom-note { margin-top: auto; padding-top: 30px; text-align: center; color: #737f90; }
 .rail-bottom-note > span { font-size: 27px; color: #9c956e; }
 .rail-bottom-note p { font-size: 10px; line-height: 1.7; }

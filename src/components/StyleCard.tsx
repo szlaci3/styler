@@ -9,6 +9,10 @@ function sampleValues(style: Style, selectorId: 'page' | 'button') {
 }
 
 export function StyleCard({ style, active, inspired, onSelect, onInspire, expression }: { style: Style; active: boolean; inspired: boolean; onSelect: () => void; onInspire: () => void; expression?: Expression }) {
+  const label = style.provenance === 'joker' ? 'Joker'
+    : style.provenance === 'harlequin' ? 'Harlequin'
+    : style.provenance === 'antigravity' ? expression ?? 'AI'
+    : style.name;
   const page = sampleValues(style, 'page');
   const button = sampleValues(style, 'button');
   const surface: CSSProperties = { backgroundColor: page['background-color'], color: page.color };
@@ -25,13 +29,12 @@ export function StyleCard({ style, active, inspired, onSelect, onInspire, expres
           <span className="style-sample-lines"><i style={{ backgroundColor: page.color }} /><i /></span>
           <span className="style-sample-button" style={buttonAppearance}>{style.id}</span>
         </span>
-        <span className="style-card-id">{style.id}<span>{style.provenance === 'seed' ? 'Seed' : style.provenance === 'joker' ? 'Joker' : style.provenance === 'harlequin' ? 'Harlequin' : style.provenance === 'antigravity' ? expression ?? 'AI' : active ? 'Active' : 'Preset'}</span></span>
+        <span className="style-card-id">{label}</span>
       </button>
       <button type="button" className="inspiration-button" aria-label={`Use ${style.id} as inspiration`} aria-pressed={inspired}
         title={inspired ? `Clear ${style.id} inspiration` : `Use ${style.name} for future generation`} onClick={onInspire}>
         <span aria-hidden="true">{inspired ? '✦' : '✧'}</span> {inspired ? 'Inspired' : 'Inspire'}
       </button>
-      <p className="rail-caption">{style.name}</p>
     </div>
   );
 }

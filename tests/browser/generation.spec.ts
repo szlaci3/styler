@@ -27,7 +27,7 @@ test('Joker and Harlequin arrive locally, then four AI slots settle progressivel
   await expect(page.locator('[data-slot]')).toHaveCount(7);
   await expect(page.locator('[data-slot="G2"] .style-card')).toBeVisible();
   await expect(page.locator('[data-slot="G3"] .style-card')).toBeAttached();
-  await expect(page.locator('[data-slot="G3"] .style-card-id > span')).toHaveText('Harlequin');
+  await expect(page.locator('[data-slot="G3"] .style-card-id')).toHaveText('Harlequin');
   for (const [index, expression] of EXPRESSIONS.entries()) {
     await expect(page.locator(`[data-slot="G${index + 4}"] .generation-slot strong`)).toHaveText(`G${index + 4} · ${expression}`);
   }
@@ -69,11 +69,11 @@ test('Joker and Harlequin arrive locally, then four AI slots settle progressivel
   await expect(page.locator('[data-slot]')).toHaveCount(7);
   await expect(page.locator('[data-slot] .style-card')).toHaveCount(7);
   for (const [index, expression] of EXPRESSIONS.entries()) {
-    await expect(page.locator(`[data-slot="G${index + 4}"] .style-card-id > span`)).toHaveText(expression);
+    await expect(page.locator(`[data-slot="G${index + 4}"] .style-card-id`)).toHaveText(expression);
   }
   await page.locator('[data-slot="G4"] .style-card').click();
-  await expect(page.locator('[data-slot="G4"] .style-card-id > span')).toHaveText('Professional');
-  await expect(page.locator('[data-slot="G2"] .style-card-id > span')).toHaveText('Joker');
+  await expect(page.locator('[data-slot="G4"] .style-card-id')).toHaveText('Professional');
+  await expect(page.locator('[data-slot="G2"] .style-card-id')).toHaveText('Joker');
   await page.screenshot({ path: 'test-results/expressions-ready.png' });
   expect(requests).toHaveLength(5); // Four originals and one explicit retry.
 });

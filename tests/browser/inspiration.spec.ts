@@ -77,7 +77,7 @@ test('Joker, Harlequin, AI and retry retain captured inputs; each local style ca
   const localCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
   expect(localCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
   await page.locator('[data-slot="G3"] .style-card').click();
-  await expect(page.locator('[data-slot="G3"] .style-card-id > span')).toHaveText('Harlequin');
+  await expect(page.locator('[data-slot="G3"] .style-card-id')).toHaveText('Harlequin');
   await expect(page.locator('.sample-page')).toHaveCSS('font-family', '"Courier New", monospace');
   await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('background-color', 'rgb(36, 91, 99)');
   const harlequinCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
