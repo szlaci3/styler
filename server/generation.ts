@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { selectors, properties, fonts, parseStyle } from '../shared/style.ts';
+import { selectors, properties, fonts, parseStyle, type Style } from '../shared/style.ts';
+import { seedStyle } from '../src/styles/presets.ts';
 import { constrainStyle } from '../shared/constraints.ts';
 import { captureGenerationSnapshot } from '../shared/generation.ts';
 import { AGENT, ENDPOINT, extractOutputText, isRecord, numericUsage } from './probe-contract.ts';
@@ -30,6 +31,24 @@ const outputSchema = {
       } } }, required: ['selectorId', 'declarations'] } },
   }, required: ['schemaVersion', 'id', 'name', 'provenance', 'rules'],
 };
+
+// Internal AI card treatment, captured from original inspiration rather than
+// live preview CSS. Missing inspiration declarations fall back individually.
+function inheritCardTreatment(style: Style, inspiration: Style | null): Style {
+  const copied = (property: string) => (property.startsWith('border-') && property.endsWith('-color'))
+    || property.startsWith('padding-');
+  const values = new Map(seedStyle.rules.find(r => r.selectorId === 'card')!.declarations
+    .filter(d => copied(d.property)).map(d => [d.property, d]));
+  for (const d of inspiration?.rules.find(r => r.selectorId === 'card')?.declarations ?? []) {
+    if (copied(d.property)) values.set(d.property, d);
+  }
+  const card = style.rules.find(r => r.selectorId === 'card');
+  const declarations = (card?.declarations ?? []).map(d => values.get(d.property) ?? d);
+  for (const d of values.values()) if (!declarations.some(existing => existing.property === d.property)) declarations.push(d);
+  const rules = style.rules.map(r => r.selectorId === 'card' ? { ...r, declarations } : r);
+  if (!card) rules.push({ selectorId: 'card', declarations });
+  return parseStyle({ ...style, rules });
+}
 
 export function makeGenerationRequest(input: unknown) {
   const { id, snapshot, inspiration } = parseGenerationRequest(input);
@@ -110,6 +129,9 @@ export async function generateStyle(input: unknown, options: { key?: string; fet
       const freeDeclarations = style.rules.flatMap(r => r.declarations).length;
       const allConstrained = request.snapshot.length === Object.keys(selectors).length * Object.keys(properties).length;
       if (!freeDeclarations && !allConstrained) throw new Error();
+      // Check meaningful provider output before adding defaults. Explicit
+      // constraints are applied last so both locks and omissions always win.
+      style = constrainStyle(inheritCardTreatment(raw, request.inspiration), request.snapshot);
     } catch { throw new GenerationError('Invalid generated style.'); }
     report.valid = true; report.validationStage = 'accepted'; report.outcome = 'success';
     return { style, metrics: { requestId, elapsedMs: Math.round(performance.now() - started), usage: report.usage, cost: 'unavailable' } };

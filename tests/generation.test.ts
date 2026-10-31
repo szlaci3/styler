@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { generateStyle, makeGenerationRequest, parseGenerationRequest } from '../server/generation.ts';
 import { AGENT } from '../server/probe-contract.ts';
 import { seedStyle, presets } from '../src/styles/presets.ts';
+import { parseStyle, type Style } from '../shared/style.ts';
 
 const request = { id: 'G3', snapshot: [{ selectorId: 'button', property: 'color', state: 'locked', value: '#abcdef' },
   { selectorId: 'card', property: 'padding-top', state: 'unset' }] };
@@ -10,6 +11,69 @@ const output = { ...seedStyle, id: 'G3', provenance: 'antigravity' };
 const envelope = (style: unknown) => ({ agent: AGENT, status: 'completed', usage: { total_tokens: 12, secret: 'hidden' },
   steps: [{ type: 'model_output', content: [{ type: 'text', text: JSON.stringify(style) }] }] });
 const mock = (data: unknown, status = 200): typeof fetch => async () => Response.json(data, { status });
+
+const cardValues = (style: Style) => Object.fromEntries(style.rules.find(r => r.selectorId === 'card')?.declarations.map(d => [d.property, d.value]) ?? []);
+
+test('AI card border colors and padding copy inspiration while all other generated values survive', async () => {
+  const raw = parseStyle({ ...presets[1], id: 'G3', provenance: 'antigravity' });
+  const inspiration = presets[3]!;
+  const before = JSON.stringify({ raw, inspiration, seedStyle });
+  const { style } = await generateStyle({ id: 'G3', snapshot: [], inspiration }, {
+    key: 'test-only', fetcher: mock(envelope(raw)), log: () => {},
+  });
+  const expected = cardValues(inspiration), actual = cardValues(style);
+  for (const [property, value] of Object.entries(expected)) {
+    const copied = property.startsWith('padding-') || (property.startsWith('border-') && property.endsWith('-color'));
+    assert.equal(actual[property], copied ? value : cardValues(raw)[property], property);
+  }
+  assert.deepEqual(style.rules.filter(r => r.selectorId !== 'card'), raw.rules.filter(r => r.selectorId !== 'card'));
+  assert.equal(JSON.stringify({ raw, inspiration, seedStyle }), before);
+  assert.ok(Object.isFrozen(style.rules.find(r => r.selectorId === 'card')?.declarations));
+});
+
+test('AI cards use G1 without inspiration, for absent rules, and for individual missing inspiration values', async () => {
+  const raw = parseStyle({ ...presets[1], id: 'G3', provenance: 'antigravity' });
+  const sparse = parseStyle({ ...presets[3], rules: [{ selectorId: 'card', declarations: [
+    { id: 'card:padding-left', property: 'padding-left', value: '37px' },
+  ] }] });
+  for (const inspiration of [null, sparse, parseStyle({ ...sparse, rules: [] })]) {
+    for (const candidate of [raw, parseStyle({ ...raw, rules: raw.rules.filter(r => r.selectorId !== 'card') })]) {
+      const { style } = await generateStyle({ id: 'G3', snapshot: [], inspiration }, {
+        key: 'test-only', fetcher: mock(envelope(candidate)), log: () => {},
+      });
+      const actual = cardValues(style);
+      for (const [property, value] of Object.entries(cardValues(seedStyle))) {
+        if (!property.startsWith('padding-') && !(property.startsWith('border-') && property.endsWith('-color'))) continue;
+        assert.equal(actual[property], inspiration === sparse && property === 'padding-left' ? '37px' : value, property);
+      }
+    }
+  }
+});
+
+test('captured card locks and Unset override internal inheritance, including on repeated requests', async () => {
+  const snapshot = [
+    { selectorId: 'card', property: 'border-left-color', state: 'locked', value: '#abcdef' },
+    { selectorId: 'card', property: 'padding-right', state: 'locked', value: '31px' },
+    { selectorId: 'card', property: 'background-color', state: 'unset' },
+    { selectorId: 'card', property: 'padding-top', state: 'unset' },
+    { selectorId: 'card', property: 'border-top-color', state: 'unset' },
+  ];
+  const live = JSON.parse(JSON.stringify(presets[3]));
+  const captured = parseGenerationRequest({ id: 'G3', snapshot, inspiration: live });
+  const original = JSON.stringify(captured);
+  live.rules.length = 0;
+  for (let retry = 0; retry < 2; retry++) {
+    const { style } = await generateStyle(captured, { key: 'test-only', fetcher: mock(envelope(output)), log: () => {} });
+    const actual = cardValues(style);
+    assert.equal(actual['border-left-color'], '#abcdef');
+    assert.equal(actual['padding-right'], '31px');
+    assert.equal(actual['background-color'], undefined);
+    assert.equal(actual['padding-top'], undefined);
+    assert.equal(actual['border-top-color'], undefined);
+    assert.equal(actual['padding-left'], '16px');
+    assert.equal(JSON.stringify(captured), original);
+  }
+});
 
 test('full-schema agent contract uses exact system and normalizes captured constraints', async () => {
   const reports: object[] = [];
@@ -40,6 +104,7 @@ test('provider failures are sanitized, recorded, and never automatically retried
 
 test('unsafe, malformed, wrong-agent, empty and oversized output is rejected', async () => {
   const bad = [envelope({ ...output, rules: [{ selectorId: 'page', declarations: [{ id: 'page:color', property: 'color', value: 'url(secret)' }] }] }),
+    envelope({ ...output, rules: [{ selectorId: 'card', declarations: [{ id: 'card:padding-top', property: 'padding-top', value: '999px' }] }] }),
     envelope({ ...output, id: 'G9' }), envelope({ ...output, provenance: 'joker' }), envelope({ ...output, rules: [] }),
     { ...envelope(output), agent: 'other' }, { ...envelope(output), status: 'failed' },
     { ...envelope(output), steps: [{ type: 'model_output', content: [{ type: 'text', text: '{bad' }] }] }];

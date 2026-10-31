@@ -1,6 +1,6 @@
 # Current development status
 
-Last updated: 2026-10-30 (Europe/Brussels).
+Last updated: 2026-10-31 (Europe/Brussels).
 
 ## Authority and scope
 
@@ -8,6 +8,7 @@ Last updated: 2026-10-30 (Europe/Brussels).
 - User authorized M5–M11 together, then M12–M18 through successive milestone selections, including “Continue” after M17. **M1–M18 are complete: local desktop V1 has passed acceptance and measured handoff.**
 - The original roadmap ends at M18. The user subsequently authorized backend migration to Netlify and explicitly chose background generation. **The migration is implemented and locally verified; no hosted deployment has been performed.** V2 remains deferred.
 - Existing ignored GEMINI_API_KEY is authorized for integration, server-side only. Exact agent remains antigravity-preview-09-2026.
+- Follow-on request on 2026-10-31: internally copy only `.sample-card` border colors and padding into new Antigravity results from captured inspiration, with per-declaration G1 fallback. Explicit locks and Unset remain authoritative. No UI controls or Joker changes; other AI card properties remain generated. User requested commit and push to main.
 
 ## Working implementation
 
@@ -26,6 +27,8 @@ Last updated: 2026-10-30 (Europe/Brussels).
 - Netlify configuration builds the frontend and deploys start/health, signed background worker, status and hourly-cleanup functions. Strongly consistent Blobs holds temporary job state; atomic claims prevent duplicate deliveries from repeating paid work. Provider deadline remains 90 seconds; job/polling deadline is 150 seconds. Visible history remains session-only.
 
 ## Verification
+
+2026-10-31 card-treatment follow-on: **29 offline tests passed**, including inspiration/G1 per-declaration fallback, missing card rules, preservation of all other AI properties, captured-context retry, lock/Unset priority, immutability and rejection of unsafe card values before normalization. **49 Edge checks passed** using mocked provider responses; **app build**, **Netlify function packaging**, and **git diff --check** passed. No paid request or hosted verification was performed for this change. The requested implementation is complete; hosted deployment verification remains the next separate action below.
 
 Latest hosting-migration evidence and deployment instructions are in netlify-deployment.md. Local V1 acceptance remains m18-v1-acceptance.md; m17-generation-edits-verification.md and m16-countdown-verification.md preserve focused edit/timer evidence. Real-provider evidence remains m15-live-measurements.json, independently reviewed and usage-summed during M18; m12-mvp-acceptance.md preserves the MVP acceptance boundary. Earlier reports and m11-live-measurements.json preserve historical milestone and real-provider evidence.
 
