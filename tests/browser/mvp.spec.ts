@@ -42,8 +42,8 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     await backgroundLock.focus(); await page.keyboard.press('Space');
     await page.getByRole('button', { name: 'Lock card padding-top', exact: true }).click();
     await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
-    await expect(previewButton).toHaveCSS('background-color', 'rgb(52, 78, 65)');
-    await expect(page.locator('.sample-card').first()).toHaveCSS('padding-top', '14px');
+    await expect(previewButton).toHaveCSS('background-color', 'rgb(36, 91, 99)');
+    await expect(page.locator('.sample-card').first()).toHaveCSS('padding-top', '18px');
     const unsetPadding = page.getByRole('button', { name: 'Unset card padding-top', exact: true });
     await unsetPadding.focus(); await page.keyboard.press('Enter');
     await expect(unsetPadding).toHaveAttribute('aria-pressed', 'true');
@@ -58,14 +58,14 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     await expect.poll(() => requests.length).toBe(5);
     const captured = requests[0]!;
     expect(captured.snapshot).toEqual([
-      { selectorId: 'button', property: 'background-color', state: 'locked', value: '#344e41' },
+      { selectorId: 'button', property: 'background-color', state: 'locked', value: '#245b63' },
       { selectorId: 'card', property: 'padding-top', state: 'unset' },
     ]);
     await page.locator('[data-slot="G2"] .style-card').click();
-    await expect(previewButton).toHaveCSS('background-color', 'rgb(52, 78, 65)');
+    await expect(previewButton).toHaveCSS('background-color', 'rgb(36, 91, 99)');
     const jokerCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
     expect(jokerCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
-    expect(jokerCss).toContain('background-color: #344e41;');
+    expect(jokerCss).toContain('background-color: #245b63;');
 
     // Live edits are allowed, but the pending AI and its retry keep the old snapshot.
     await backgroundLock.click();
@@ -81,7 +81,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G2');
     const ai = page.locator('[data-slot="G3"] .style-card');
     await ai.focus(); await page.keyboard.press('Space');
-    await expect(previewButton).toHaveCSS('background-color', 'rgb(52, 78, 65)');
+    await expect(previewButton).toHaveCSS('background-color', 'rgb(36, 91, 99)');
     const aiCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
     expect(aiCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
 
@@ -149,7 +149,7 @@ test('page load and preview interactions never generate; manual send cancels cou
   await page.clock.runFor(10);
   await expect(page.getByRole('button', { name: 'Retry G3' })).toBeEnabled();
   await expect(page.locator('[data-slot="G3"]')).toContainText('Generation timed out.');
-  await page.getByRole('button', { name: 'S1: Foundation', exact: true }).click();
+  await page.getByRole('button', { name: 'S1: Tidal Atelier', exact: true }).click();
   await page.clock.fastForward(60_000);
   expect(calls).toBe(5);
   await expect(page.locator('[data-slot]')).toHaveCount(7);

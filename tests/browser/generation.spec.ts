@@ -51,7 +51,7 @@ test('six slots settle progressively with two AI lanes, immutable context, parti
   expect(requests).toHaveLength(5);
   expect(peak).toBe(2);
   for (const request of requests) expect(request.snapshot).toEqual(original.snapshot);
-  expect(original.snapshot).toContainEqual({ selectorId: 'button', property: 'color', state: 'locked', value: '#ffffff' });
+  expect(original.snapshot).toContainEqual({ selectorId: 'button', property: 'color', state: 'locked', value: '#fcfbf7' });
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('S1');
   await expect(page.locator('[data-slot="G5"]')).toContainText('Quota exceeded.');
   const failed = requests.find(r => r.id === 'G5');

@@ -9,15 +9,15 @@ test('locks survive selections, unset removes overrides, and originals remain in
   await expect(lock).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'Lock card padding-top', exact: true }).click();
   await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
-  await expect(target).toHaveCSS('background-color', 'rgb(52, 78, 65)');
-  await expect(page.locator('.sample-card').first()).toHaveCSS('padding-top', '14px');
+  await expect(target).toHaveCSS('background-color', 'rgb(36, 91, 99)');
+  await expect(page.locator('.sample-card').first()).toHaveCSS('padding-top', '18px');
   await page.getByRole('button', { name: 'Unset button background-color', exact: true }).click();
   await expect(lock).toHaveAttribute('aria-pressed', 'false');
   await expect(target).toHaveCSS('background-color', 'rgb(214, 177, 239)');
   const css = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-locks]')!.textContent);
   expect(css).not.toContain('unset');
-  await page.getByRole('button', { name: 'S1: Foundation', exact: true }).click();
-  await expect(target).toHaveCSS('background-color', 'rgb(52, 78, 65)');
+  await page.getByRole('button', { name: 'S1: Tidal Atelier', exact: true }).click();
+  await expect(target).toHaveCSS('background-color', 'rgb(36, 91, 99)');
 });
 
 test('native cascade keeps specificity and source order independent of lock click order', async ({ page }) => {
@@ -26,7 +26,7 @@ test('native cascade keeps specificity and source order independent of lock clic
   // Real shadow-root elements intentionally overlap two bounded selector groups.
   await page.locator('.sample-button').first().evaluate(el => el.classList.add('sample-card-link'));
   const color = page.getByRole('button', { name: 'Find your space' });
-  await expect(color).toHaveCSS('color', 'rgb(105, 116, 109)');
+  await expect(color).toHaveCSS('color', 'rgb(83, 103, 106)');
   for (const selector of ['details', 'button']) await page.getByRole('button', { name: `Lock ${selector} color`, exact: true }).click();
   const css1 = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-locks]')!.textContent);
   for (const selector of ['details', 'button']) await page.getByRole('button', { name: `Lock ${selector} color`, exact: true }).click();
@@ -34,10 +34,10 @@ test('native cascade keeps specificity and source order independent of lock clic
   const css2 = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-locks]')!.textContent);
   expect(css1).toBe(css2);
   await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
-  await expect(color).toHaveCSS('color', 'rgb(105, 116, 109)');
+  await expect(color).toHaveCSS('color', 'rgb(83, 103, 106)');
   // An explicit child declaration still beats an inherited page lock.
   await page.getByRole('button', { name: 'Lock page color', exact: true }).click();
-  await page.getByRole('button', { name: 'S1: Foundation', exact: true }).click();
+  await page.getByRole('button', { name: 'S1: Tidal Atelier', exact: true }).click();
   await expect(page.locator('.sample-heading')).toHaveCSS('color', 'rgb(243, 234, 247)');
-  await expect(page.locator('.sample-copy').first()).toHaveCSS('color', 'rgb(105, 116, 109)');
+  await expect(page.locator('.sample-copy').first()).toHaveCSS('color', 'rgb(83, 103, 106)');
 });

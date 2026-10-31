@@ -68,12 +68,12 @@ test('Joker, AI and retry share original inspiration despite edits; generated st
   const original = requests[0]!;
   expect(original.inspiration?.id).toBe('S4');
   expect(original.inspiration?.rules.find(rule => rule.selectorId === 'button')?.declarations.find(d => d.property === 'background-color')?.value).toBe('#ffb545');
-  expect(original.snapshot).toContainEqual({ selectorId: 'button', property: 'background-color', state: 'locked', value: '#344e41' });
+  expect(original.snapshot).toContainEqual({ selectorId: 'button', property: 'background-color', state: 'locked', value: '#245b63' });
   await page.getByRole('button', { name: 'Use S2 as inspiration', exact: true }).click();
   await page.getByRole('button', { name: 'Lock button background-color', exact: true }).click();
   await page.locator('[data-slot="G2"] .style-card').click();
   await expect(page.locator('.sample-page')).toHaveCSS('font-family', '"Courier New", monospace');
-  await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('background-color', 'rgb(52, 78, 65)');
+  await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('background-color', 'rgb(36, 91, 99)');
   const localCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
   expect(localCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
   release();
@@ -86,7 +86,7 @@ test('Joker, AI and retry share original inspiration despite edits; generated st
   await expect(page.getByRole('button', { name: 'Use S2 as inspiration', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G2');
   await page.locator('[data-slot="G3"] .style-card').click();
-  await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('background-color', 'rgb(52, 78, 65)');
+  await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('background-color', 'rgb(36, 91, 99)');
   const aiCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
   expect(aiCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
   await page.getByRole('button', { name: 'Use G3 as inspiration', exact: true }).click();

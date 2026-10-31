@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('effective inspector includes inherited and conditional values and settles after selection', async ({ page }) => {
   await page.goto('/');
   const row = page.locator('.css-rule').filter({ has: page.locator('.css-selector', { hasText: /^\.sample-heading \{/ }) }).locator('.css-declaration').filter({ has: page.locator('dt', { hasText: /^color:/ }) });
-  await expect(row.locator('dd')).toHaveText('rgb(37, 53, 46);');
+  await expect(row.locator('dd')).toHaveText('rgb(33, 62, 67);');
   await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
   await expect(row.locator('dd')).toHaveText('rgb(243, 234, 247);');
   await page.getByRole('switch').uncheck();

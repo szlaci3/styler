@@ -74,9 +74,9 @@ test('new controls use shared locks, native validation and editable local confir
   await page.getByRole('button', { name: 'Lock image border-top-left-radius', exact: true }).click();
   await page.getByRole('button', { name: 'Lock subheading font-size', exact: true }).click();
   await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
-  await expect(page.getByRole('combobox', { name: 'Your corner' })).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-  await expect(page.getByRole('textbox', { name: 'Anything we should know?' })).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-  await expect(page.locator('img.sample-image').first()).toHaveCSS('border-top-left-radius', '8px');
+  await expect(page.getByRole('combobox', { name: 'Your corner' })).toHaveCSS('background-color', 'rgb(255, 253, 248)');
+  await expect(page.getByRole('textbox', { name: 'Anything we should know?' })).toHaveCSS('background-color', 'rgb(255, 253, 248)');
+  await expect(page.locator('img.sample-image').first()).toHaveCSS('border-top-left-radius', '10px');
   await page.getByRole('button', { name: 'Unset input background-color', exact: true }).click();
   await expect(page.getByRole('combobox', { name: 'Your corner' })).toHaveCSS('background-color', 'rgb(48, 42, 61)');
   await page.getByRole('button', { name: 'Plan a visit', exact: true }).click();

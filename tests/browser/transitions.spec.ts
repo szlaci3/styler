@@ -28,11 +28,11 @@ test('colors, corners, borders, padding and shadows interpolate on the same prev
   expect(midpoint.background).not.toBe(originalColor);
   expect(midpoint.background).not.toBe('rgb(255, 181, 69)');
   expect(midpoint.radius).toBeGreaterThan(0);
-  expect(midpoint.radius).toBeLessThan(8);
+  expect(midpoint.radius).toBeLessThan(10);
   expect(midpoint.border).toBeGreaterThanOrEqual(1);
   expect(midpoint.border).toBeLessThan(2);
-  expect(midpoint.padding).toBeGreaterThan(14);
-  expect(midpoint.padding).toBeLessThan(16);
+  expect(midpoint.padding).toBeGreaterThan(16);
+  expect(midpoint.padding).toBeLessThan(18);
   expect(midpoint.shadow).not.toBe('none');
   expect(midpoint.fontFamily).toContain('Courier New');
   expect(midpoint.properties).not.toContain('font-family');
@@ -70,7 +70,7 @@ test('one ShadowRoot, portal and stylesheet survive rapid selection changes', as
 test('preview and application CSS cannot cross the shadow boundary', async ({ page }) => {
   await page.goto('/');
   const heading = page.getByRole('heading', { name: 'Make room for better work.' });
-  await expect(heading).toHaveCSS('font-size', '58px');
+  await expect(heading).toHaveCSS('font-size', '56px');
   const headingColor = await heading.evaluate(element => getComputedStyle(element).color);
   const shellColor = await page.locator('.app-wordmark h1').evaluate(element => getComputedStyle(element).color);
   await page.addStyleTag({ content: `
@@ -78,7 +78,7 @@ test('preview and application CSS cannot cross the shadow boundary', async ({ pa
     .sample-heading { color: magenta !important; font-size: 71px !important; }
     .sample-button { padding: 44px !important; }
   ` });
-  await expect(heading).toHaveCSS('font-size', '58px');
+  await expect(heading).toHaveCSS('font-size', '56px');
   await expect(heading).toHaveCSS('color', headingColor);
   await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('padding-top', '12px');
   await page.locator('.preview-host').evaluate(element => {

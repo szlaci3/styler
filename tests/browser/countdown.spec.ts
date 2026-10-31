@@ -51,7 +51,7 @@ test('eight-second boundary, final 3/2/1 labels and one automatic six-slot batch
   await expect(generate).toHaveAccessibleName('Generate');
   expect(requests).toHaveLength(5);
   await expect(page.locator('[data-slot]')).toHaveCount(7);
-  for (const request of requests) expect(request.snapshot).toEqual([{ selectorId: 'button', property: 'color', state: 'locked', value: '#ffffff' }]);
+  for (const request of requests) expect(request.snapshot).toEqual([{ selectorId: 'button', property: 'color', state: 'locked', value: '#fcfbf7' }]);
   await page.clock.runFor(60_000);
   expect(requests).toHaveLength(5);
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('S1');

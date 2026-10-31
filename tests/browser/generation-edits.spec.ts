@@ -39,7 +39,7 @@ for (const outcome of ['success', 'partial', 'failure'] as const) {
     const captured = await page.locator('[data-declaration="button:background-color"] dd').innerText();
     await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
     await expect(page.locator('[data-declaration="button:background-color"] dd')).toHaveText(captured);
-    await expect(page.locator('.preview-host .sample-button').first()).toHaveCSS('background-color', 'rgb(52, 78, 65)');
+    await expect(page.locator('.preview-host .sample-button').first()).toHaveCSS('background-color', 'rgb(36, 91, 99)');
     await page.getByRole('button', { name: 'Unset card padding-top', exact: true }).click();
     await page.getByRole('button', { name: 'Use S2 as inspiration', exact: true }).click();
     await expect(status).toContainText('This batch uses earlier constraints.');
@@ -64,7 +64,7 @@ for (const outcome of ['success', 'partial', 'failure'] as const) {
     expect(mock.requests).toHaveLength(10);
     for (const request of mock.requests.slice(5)) {
       expect(request.inspiration?.id).toBe('S2');
-      expect(request.snapshot).toContainEqual({ selectorId: 'button', property: 'background-color', state: 'locked', value: '#344e41' });
+      expect(request.snapshot).toContainEqual({ selectorId: 'button', property: 'background-color', state: 'locked', value: '#245b63' });
       expect(request.snapshot).toContainEqual({ selectorId: 'card', property: 'padding-top', state: 'unset' });
     }
     await expect(status).not.toContainText('have not been used');

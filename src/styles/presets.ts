@@ -34,7 +34,7 @@ const themes = [
   { id: 'S7', name: 'Monograph', page: '#f3f3f3', ink: '#191919', muted: '#636363', accent: '#444444', button: '#191919', label: '#ffffff', surface: '#ffffff', border: '#8b8b8b', font: "'Segoe UI', Arial, sans-serif", size: 54, weight: '500', round: 0, space: 24, width: 1, shadow: 'none', italic: false },
 ] as const;
 
-export const presets = Object.freeze(themes.map(theme => parseStyle({
+const originalPresets = Object.freeze(themes.map(theme => parseStyle({
   schemaVersion: 1, id: theme.id, name: theme.name, provenance: 'preset', rules: [
     rule('page', { color: theme.ink, 'background-color': theme.page, 'font-family': theme.font, ...padding(32) }),
     rule('heading', { 'font-family': theme.font, 'font-size': `${theme.size}px`, 'font-weight': theme.weight, 'line-height': '1.05', 'letter-spacing': '-2px' }),
@@ -51,9 +51,8 @@ export const presets = Object.freeze(themes.map(theme => parseStyle({
   ],
 })));
 
-// Independently designed seed and shared generation fallback, distinct from S1.
-export const seedStyle = parseStyle({
-  schemaVersion: 1, id: 'G1', name: 'Tidal Atelier', provenance: 'seed', rules: [
+const tidalAtelier = parseStyle({
+  schemaVersion: 1, id: 'S1', name: 'Tidal Atelier', provenance: 'preset', rules: [
     rule('page', { color: '#213e43', 'background-color': '#edf3f2', 'font-family': 'Georgia, serif', ...padding(32) }),
     rule('heading', { 'font-family': 'Georgia, serif', 'font-size': '56px', 'font-weight': '400', 'line-height': '1.08', 'letter-spacing': '-1.8px' }),
     rule('accent', { color: '#a64e36', 'font-style': 'italic', 'font-weight': '400' }),
@@ -68,3 +67,9 @@ export const seedStyle = parseStyle({
     rule('image', { ...radius(10), ...border(1, '#d6ded8') }),
   ],
 });
+
+// Rotate complete designs: Foundation S1 → S5, Rosewater S5 → G1,
+// Tidal Atelier G1 → S1. Rules stay intact; provenance follows the slot.
+export const presets = Object.freeze(originalPresets.map((style, index) => index === 0 ? tidalAtelier
+  : index === 4 ? parseStyle({ ...originalPresets[0], id: 'S5' }) : style));
+export const seedStyle = parseStyle({ ...originalPresets[4], id: 'G1', provenance: 'seed' });

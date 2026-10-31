@@ -200,3 +200,7 @@ The bounded schema accepts only #RGB, #RRGGBB and #RRGGBBAA, including shadow co
 ## Independent G1 design (2026-10-31)
 
 G1 is now Tidal Atelier, an explicit immutable rule set rather than a copy of S1. Mineral-blue background and warm ivory surfaces balance deep teal text/buttons with terracotta accents. Serif headings, 18px card padding/corners and restrained translucent shadows distinguish its appearance while fitting the existing desktop layout. G1 retains seed provenance and no provider call; the initial selected style is still S1. Both Joker's color fallback and Antigravity's card border-color/padding fallback automatically use this single seed definition. Browser journey selectors read its name from seedStyle so naming changes do not obscure behavioral checks.
+
+## S1/S5/G1 rotation (2026-10-31, supersedes the original slots above)
+
+Rotate the complete immutable designs without changing any declarations: Foundation moves from S1 to S5, Rosewater from S5 to G1, and Tidal Atelier from G1 to S1. Preset ordering remains S1–S7 and G1 retains seed provenance; Tidal Atelier now has preset provenance. The initial S1 preview is therefore Tidal Atelier. Existing generation code still uses G1 as its fallback, which now means Rosewater for Joker colors and AI card border colors/padding. No new rotation state or user control is needed. Browser expectations follow the new initial S1 values while retaining all cascade, isolation and immutable-snapshot checks.

@@ -73,7 +73,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     const captured = requests[10]!;
     expect(captured.inspiration?.id).toBe('G3');
     expect(captured.snapshot).toEqual([
-      { selectorId: 'button', property: 'background-color', state: 'locked', value: '#344e41' },
+      { selectorId: 'button', property: 'background-color', state: 'locked', value: '#245b63' },
       { selectorId: 'card', property: 'padding-top', state: 'unset' },
     ]);
 
@@ -82,7 +82,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     await activate(page, page.getByRole('button', { name: 'Unset card padding-bottom', exact: true }));
     await activate(page, page.getByRole('button', { name: 'S3: After Hours', exact: true }));
     await page.clock.runFor(400);
-    await expect(page.getByRole('button', { name: 'Find your space', exact: true })).toHaveCSS('background-color', 'rgb(52, 78, 65)');
+    await expect(page.getByRole('button', { name: 'Find your space', exact: true })).toHaveCSS('background-color', 'rgb(36, 91, 99)');
     await expect(status).toContainText('This batch uses earlier constraints.');
     await page.clock.runFor(10_000);
     expect(requests).toHaveLength(12);
@@ -123,7 +123,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     await activate(page, page.locator('[data-slot="G17"] .style-card'));
     await page.clock.runFor(400);
     const css = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
-    expect(css).toContain('background-color: #344e41;');
+    expect(css).toContain('background-color: #245b63;');
     expect(css).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
     await expect(page.getByRole('textbox', { name: 'Email address' })).toHaveValue('v1@example.com');
     await expect(page.getByRole('switch', { name: 'Quiet hours' })).not.toBeChecked();
