@@ -158,8 +158,8 @@ export function App() {
           <header className="panel-heading rail-heading"><span className="panel-kicker">02</span><h2 id="generated-label">Generated</h2></header>
           <div ref={generatedRail} className="rail-scroll scroll-region" tabIndex={0} role="region" aria-label="Scrollable generated styles">
              {generation.slots.map(slot => <div data-slot={slot.id} key={slot.id}>
-              {slot.style ? <StyleCard style={slot.style} active={selectedId === slot.id} inspired={slot.id === inspirationId} onSelect={() => setSelectedId(slot.id)} onInspire={() => toggleInspiration(slot.id)} />
-                : <div className="generation-slot" role="status"><strong>{slot.id} · {slot.seed !== undefined ? 'Joker' : slot.stage === 'quick' ? 'Quick AI' : 'AI'}</strong>
+              {slot.style ? <StyleCard style={slot.style} active={selectedId === slot.id} inspired={slot.id === inspirationId} expression={slot.expression} onSelect={() => setSelectedId(slot.id)} onInspire={() => toggleInspiration(slot.id)} />
+                : <div className="generation-slot" role="status"><strong>{slot.id} · {slot.seed !== undefined ? 'Joker' : slot.expression ?? 'AI'}</strong>
                   <p>{slot.status === 'pending' ? 'Generating…' : slot.error}</p>
                   {slot.status === 'error' && <button disabled={generation.active} onClick={() => retry(slot)} aria-label={`Retry ${slot.id}`}>Retry</button>}
                 </div>}

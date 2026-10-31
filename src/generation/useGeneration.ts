@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react';
 import { parseStyle, type Style } from '../../shared/style.ts';
 import type { Snapshot } from '../../shared/constraints.ts';
-import { AI_RESULTS_PER_BATCH, AI_CONCURRENCY, captureGenerationSnapshot, type GenerationSnapshot } from '../../shared/generation.ts';
+import { EXPRESSIONS, AI_CONCURRENCY, captureGenerationSnapshot, type Expression, type GenerationSnapshot } from '../../shared/generation.ts';
 import { seedStyle } from '../styles/presets.ts';
 import { makeJoker } from './joker.ts';
 import { requestStyle } from './requestStyle.ts';
 
-export type Slot = { id: string; context: GenerationSnapshot; seed?: number; stage?: 'quick' | 'additional'; status: 'pending' | 'ready' | 'error'; style?: Style; error?: string };
+export type Slot = { id: string; context: GenerationSnapshot; seed?: number; expression?: Expression; status: 'pending' | 'ready' | 'error'; style?: Style; error?: string };
 export function useGeneration() {
   const [slots, setSlots] = useState<Slot[]>([{ id: 'G1', context: captureGenerationSnapshot([]), status: 'ready', style: seedStyle }]);
   const [active, setActive] = useState(false);
@@ -17,7 +17,7 @@ export function useGeneration() {
   const update = (id: string, patch: Partial<Slot>) => setSlots(old => old.map(slot => slot.id === id ? { ...slot, ...patch } : slot));
   async function remote(slot: Slot) {
     try {
-      const style = parseStyle(await requestStyle({ id: slot.id, snapshot: slot.context.constraints,
+      const style = parseStyle(await requestStyle({ id: slot.id, snapshot: slot.context.constraints, expression: slot.expression,
         ...(slot.context.inspiration ? { inspiration: slot.context.inspiration } : {}) }));
       if (style.id !== slot.id || style.provenance !== 'antigravity') throw new Error('Invalid generated style.');
       for (const c of slot.context.constraints) {
@@ -46,7 +46,7 @@ export function useGeneration() {
     guard.current = true; setActive(true);
     const seed = crypto.getRandomValues(new Uint32Array(1))[0]!;
     const joker: Slot = { id: `G${next.current++}`, context, seed, status: 'pending' };
-    const ai: Slot[] = Array.from({ length: AI_RESULTS_PER_BATCH }, (_, index) => ({ id: `G${next.current++}`, context, stage: index === 0 ? 'quick' : 'additional', status: 'pending' }));
+    const ai: Slot[] = EXPRESSIONS.map(expression => ({ id: `G${next.current++}`, context, expression, status: 'pending' }));
     setSlots(old => [...old, joker, ...ai]);
     setScrollTarget(joker.id);
     // Yield once so all six reserved positions can paint, independently of AI.

@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Style } from '../../shared/style.ts';
+import type { Expression } from '../../shared/generation.ts';
 
 function sampleValues(style: Style, selectorId: 'page' | 'button') {
   const values = Object.fromEntries(style.rules.find(rule => rule.selectorId === selectorId)?.declarations
@@ -7,7 +8,7 @@ function sampleValues(style: Style, selectorId: 'page' | 'button') {
   return values;
 }
 
-export function StyleCard({ style, active, inspired, onSelect, onInspire }: { style: Style; active: boolean; inspired: boolean; onSelect: () => void; onInspire: () => void }) {
+export function StyleCard({ style, active, inspired, onSelect, onInspire, expression }: { style: Style; active: boolean; inspired: boolean; onSelect: () => void; onInspire: () => void; expression?: Expression }) {
   const page = sampleValues(style, 'page');
   const button = sampleValues(style, 'button');
   const surface: CSSProperties = { backgroundColor: page['background-color'], color: page.color };
@@ -24,7 +25,7 @@ export function StyleCard({ style, active, inspired, onSelect, onInspire }: { st
           <span className="style-sample-lines"><i style={{ backgroundColor: page.color }} /><i /></span>
           <span className="style-sample-button" style={buttonAppearance}>{style.id}</span>
         </span>
-        <span className="style-card-id">{style.id}<span>{style.provenance === 'seed' ? 'Seed' : active ? 'Active' : style.provenance === 'joker' ? 'Joker' : style.provenance === 'antigravity' ? 'AI' : 'Preset'}</span></span>
+        <span className="style-card-id">{style.id}<span>{style.provenance === 'seed' ? 'Seed' : style.provenance === 'joker' ? 'Joker' : style.provenance === 'antigravity' ? expression ?? 'AI' : active ? 'Active' : 'Preset'}</span></span>
       </button>
       <button type="button" className="inspiration-button" aria-label={`Use ${style.id} as inspiration`} aria-pressed={inspired}
         title={inspired ? `Clear ${style.id} inspiration` : `Use ${style.name} for future generation`} onClick={onInspire}>

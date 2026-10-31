@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { seedStyle } from '../../src/styles/presets.ts';
 import { constrainStyle } from '../../shared/constraints.ts';
 import { parseGenerationRequest } from '../../server/generation.ts';
+import { EXPRESSIONS } from '../../shared/generation.ts';
 
 test('six slots settle progressively with two AI lanes, immutable context, partial failures and one-slot retry', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -25,7 +26,9 @@ test('six slots settle progressively with two AI lanes, immutable context, parti
   await generate.click();
   await expect(page.locator('[data-slot]')).toHaveCount(7);
   await expect(page.locator('[data-slot="G2"] .style-card')).toBeVisible();
-  await expect(page.locator('[data-slot="G3"]')).toContainText('Quick AI');
+  for (const [index, expression] of EXPRESSIONS.entries()) {
+    await expect(page.locator(`[data-slot="G${index + 3}"] .generation-slot strong`)).toHaveText(`G${index + 3} · ${expression}`);
+  }
   await expect.poll(() => requests.map(r => r.id)).toEqual(['G3', 'G4']);
   const original = requests[0]!;
   await page.getByRole('button', { name: 'Lock button color', exact: true }).click();
@@ -50,6 +53,7 @@ test('six slots settle progressively with two AI lanes, immutable context, parti
   await expect(generate).toBeEnabled();
   expect(requests).toHaveLength(5);
   expect(peak).toBe(2);
+  expect(requests.map(r => r.expression)).toEqual(EXPRESSIONS);
   for (const request of requests) expect(request.snapshot).toEqual(original.snapshot);
   expect(original.snapshot).toContainEqual({ selectorId: 'button', property: 'color', state: 'locked', value: '#fcfbf7' });
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('S1');
@@ -63,6 +67,13 @@ test('six slots settle progressively with two AI lanes, immutable context, parti
   await expect(generate).toBeEnabled();
   await expect(page.locator('[data-slot]')).toHaveCount(7);
   await expect(page.locator('[data-slot] .style-card')).toHaveCount(7);
+  for (const [index, expression] of EXPRESSIONS.entries()) {
+    await expect(page.locator(`[data-slot="G${index + 3}"] .style-card-id > span`)).toHaveText(expression);
+  }
+  await page.locator('[data-slot="G3"] .style-card').click();
+  await expect(page.locator('[data-slot="G3"] .style-card-id > span')).toHaveText('Professional');
+  await expect(page.locator('[data-slot="G2"] .style-card-id > span')).toHaveText('Joker');
+  await page.screenshot({ path: 'test-results/expressions-ready.png' });
   expect(requests).toHaveLength(6); // Five original calls, one manual retry; no dedup/regeneration.
 });
 

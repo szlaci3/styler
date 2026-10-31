@@ -404,6 +404,8 @@ Each generation action produces six style cards:
 2. One quick Antigravity result.
 3. Four additional Antigravity results.
 
+Follow-on decision (2026-10-31): the quick AI slot uses the **Professional** expression; the next four use **Playful**, **Mysterious**, **Commercial**, and **Artistic**, in that order. Show these expressions in placeholders and completed card labels alongside Joker. Each expression guides a complete coordinated design within captured inspiration and CSS constraints. Retain its expression on manual retry. Delivery remains progressive with bounded concurrency; the Professional slot is not guaranteed to finish first. Similar outputs remain acceptable without mandatory deduplication or regeneration.
+
 The Joker should appear essentially immediately.
 
 The quick AI result should ideally arrive before the four additional styles.

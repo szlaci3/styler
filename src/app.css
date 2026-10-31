@@ -47,7 +47,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2
 .style-sample-lines i { display: block; height: 3px; border-radius: 2px; background: #9ea99d; width: 85%; }
 .style-sample-lines i:last-child { width: 55%; background: #d0d5c9; }
 .style-sample-button { color: white; background: #344e41; border-radius: 4px; font-size: 10px; padding: 5px 10px; }
-.style-card-id { padding: 8px 2px 3px; display: flex; align-items: center; justify-content: space-between; font-family: Consolas, monospace; font-size: 10px; color: #e6d8b5; }
+.style-card-id { padding: 8px 2px 3px; display: flex; flex-wrap: wrap; gap: 3px 5px; align-items: center; justify-content: space-between; font-family: Consolas, monospace; font-size: 10px; color: #e6d8b5; }
 .style-card-id > span { font-family: 'Segoe UI', sans-serif; color: #a8afba; font-size: 8px; }
 .seed-card .style-card-id { color: #bfc8d5; }
 .rail-caption { color: #9ba5b3; text-align: center; font-size: 9px; line-height: 1.6; margin: 10px 0; }
