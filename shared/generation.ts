@@ -4,7 +4,9 @@ import { parseSnapshot, type Snapshot } from './constraints.ts';
 export type GenerationSnapshot = Readonly<{ constraints: Snapshot; inspiration: Style | null }>;
 export const EXPRESSIONS = ['Professional', 'Playful', 'Mysterious', 'Commercial', 'Artistic'] as const;
 export type Expression = typeof EXPRESSIONS[number];
-export const AI_RESULTS_PER_BATCH = EXPRESSIONS.length;
+// Temporary reliability mode. Keep the other briefs available for re-enabling.
+export const ENABLED_EXPRESSIONS: readonly Expression[] = Object.freeze(['Professional']);
+export const AI_RESULTS_PER_BATCH = ENABLED_EXPRESSIONS.length;
 export const AI_CONCURRENCY = 2;
 
 // Copy and deeply freeze both sources at the same boundary. Never capture live

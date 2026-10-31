@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { selectors, properties, fonts, parseStyle, type Style } from '../shared/style.ts';
 import { presets, seedStyle } from '../src/styles/presets.ts';
 import { constrainStyle } from '../shared/constraints.ts';
-import { captureGenerationSnapshot, EXPRESSIONS, type Expression } from '../shared/generation.ts';
+import { captureGenerationSnapshot, EXPRESSIONS, ENABLED_EXPRESSIONS, type Expression } from '../shared/generation.ts';
 import { AGENT, ENDPOINT, extractOutputText, isRecord, numericUsage } from './probe-contract.ts';
 
 export const GENERATION_TIMEOUT = 90_000;
@@ -14,6 +14,7 @@ export function parseGenerationRequest(input: unknown) {
   if (!isRecord(input) || !['id,snapshot', 'id,inspiration,snapshot', 'expression,id,snapshot', 'expression,id,inspiration,snapshot'].includes(Object.keys(input).sort().join(','))
     || typeof input.id !== 'string' || !/^G[1-9]\d{0,8}$/.test(input.id)) throw new GenerationError('Invalid generation request.', 400);
   if (Object.hasOwn(input, 'expression') && !(EXPRESSIONS as readonly unknown[]).includes(input.expression)) throw new GenerationError('Invalid generation request.', 400);
+  if (!ENABLED_EXPRESSIONS.includes((input.expression ?? 'Professional') as Expression)) throw new GenerationError('Generation expression temporarily disabled.', 400);
   try {
     const context = captureGenerationSnapshot(input.snapshot, input.inspiration);
     return Object.freeze({ id: input.id, snapshot: context.constraints, inspiration: context.inspiration, expression: (input.expression ?? 'Professional') as Expression });

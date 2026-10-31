@@ -406,6 +406,8 @@ Each generation action produces six style cards:
 
 Follow-on decision (2026-10-31): the quick AI slot uses the **Professional** expression; the next four use **Playful**, **Mysterious**, **Commercial**, and **Artistic**, in that order. Show these expressions in placeholders and completed card labels alongside Joker. Each expression guides a complete coordinated design within captured inspiration and CSS constraints. Retain its expression on manual retry. Delivery remains progressive with bounded concurrency; the Professional slot is not guaranteed to finish first. Similar outputs remain acceptable without mandatory deduplication or regeneration.
 
+Temporary reliability decision (2026-10-31, supersedes the active count above): enable only **Joker and Professional**. Keep the four other expression definitions for later re-enabling, but create no slots or requests for them and reject disabled expressions at the server. Existing accepted history remains browsable. All inspiration, lock/Unset, countdown and manual-retry behavior remains; retry cannot start a disabled expression.
+
 The Joker should appear essentially immediately.
 
 The quick AI result should ideally arrive before the four additional styles.

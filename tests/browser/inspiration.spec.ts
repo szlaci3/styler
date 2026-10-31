@@ -64,7 +64,7 @@ test('Joker, AI and retry share original inspiration despite edits; generated st
   const generate = page.getByRole('button', { name: 'Generate', exact: true });
   await generate.click();
   await expect(page.locator('[data-slot="G2"] .style-card')).toBeVisible();
-  await expect.poll(() => requests.length).toBe(5);
+  await expect.poll(() => requests.length).toBe(1);
   const original = requests[0]!;
   expect(original.inspiration?.id).toBe('S4');
   expect(original.inspiration?.rules.find(rule => rule.selectorId === 'button')?.declarations.find(d => d.property === 'background-color')?.value).toBe('#ffb545');
@@ -82,7 +82,7 @@ test('Joker, AI and retry share original inspiration despite edits; generated st
   await retry.click();
   await expect(page.locator('[data-slot="G3"] .style-card')).toBeVisible();
   expect(requests.filter(r => r.id === 'G3')[1]).toEqual(original);
-  await expect(page.locator('[data-slot]')).toHaveCount(7);
+  await expect(page.locator('[data-slot]')).toHaveCount(3);
   await expect(page.getByRole('button', { name: 'Use S2 as inspiration', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G2');
   await page.locator('[data-slot="G3"] .style-card').click();
@@ -92,13 +92,13 @@ test('Joker, AI and retry share original inspiration despite edits; generated st
   await page.getByRole('button', { name: 'Use G3 as inspiration', exact: true }).click();
   await expect(page.locator('.inspiration-button[aria-pressed=true]')).toHaveCount(1);
   await generate.click();
-  await expect(page.locator('[data-slot="G13"] .style-card')).toBeAttached();
-  expect(requests.find(r => r.id === 'G9')?.inspiration?.id).toBe('G3');
+  await expect(page.locator('[data-slot="G5"] .style-card')).toBeAttached();
+  expect(requests.find(r => r.id === 'G5')?.inspiration?.id).toBe('G3');
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G3');
   await page.getByRole('button', { name: 'Clear inspiration', exact: true }).click();
   await generate.click();
-  await expect(page.locator('[data-slot="G19"] .style-card')).toBeAttached();
-  expect(requests.find(r => r.id === 'G15')?.inspiration).toBe(null);
+  await expect(page.locator('[data-slot="G7"] .style-card')).toBeAttached();
+  expect(requests.find(r => r.id === 'G7')?.inspiration).toBe(null);
   await page.getByRole('button', { name: 'Use G2 as inspiration', exact: true }).click();
   await expect(page.getByRole('status', { name: 'Generation inspiration' })).toHaveText('Inspiration: G2Clear inspiration');
 });

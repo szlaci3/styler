@@ -1,4 +1,4 @@
-// Explicit paid verification only: ONE six-slot batch, FIVE provider calls.
+// Explicit paid verification only: one batch of currently enabled AI expressions.
 // Never imported by startup/offline tests. No retries, including partial failures.
 import { spawn } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -101,7 +101,7 @@ try {
   if (firstValid) await page.locator(`[data-slot="${firstValid.slot}"] .style-card`).click();
   await mkdir('verification-results', { recursive: true });
   await page.screenshot({ path: 'verification-results/m15-live-batch.png' });
-  if (requests.size !== AI_RESULTS_PER_BATCH || generatedSlots !== 7 || peak > AI_CONCURRENCY || !evidence.sharedSnapshotValid
+  if (requests.size !== AI_RESULTS_PER_BATCH || generatedSlots !== AI_RESULTS_PER_BATCH + 2 || peak > AI_CONCURRENCY || !evidence.sharedSnapshotValid
     || samples.some(sample => !sample.valid || !sample.inspirationSnapshotValid)) throw new Error('Live batch had failed slots or violated acceptance checks; evidence retained.');
 } catch (error) {
   evidence.error = error instanceof Error ? error.message : 'Live batch verification failed.';

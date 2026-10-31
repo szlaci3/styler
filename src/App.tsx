@@ -7,6 +7,7 @@ import { StyleCard } from './components/StyleCard.tsx';
 import { toggleConstraint, type Snapshot } from '../shared/constraints.ts';
 import { makeInspectionGroups, representative, normalizeComputed, type InspectionGroup } from './preview/inspection.ts';
 import { Preview } from './preview/Preview.tsx';
+import { ENABLED_EXPRESSIONS } from '../shared/generation.ts';
 
 function Inspector({ values, constraints, groups, onToggle, active, remaining, unusedConstraints, onGenerate, inspirationId, onClearInspiration }: { values: Record<string, string>; constraints: Snapshot; groups: readonly InspectionGroup[];
   remaining: number | null;
@@ -51,7 +52,7 @@ function Inspector({ values, constraints, groups, onToggle, active, remaining, u
           ? 'Edits apply to the preview. This batch uses earlier constraints.'
           : remaining !== null && !active ? 'Sending eight seconds after the last constraint change.'
           : unusedConstraints ? 'Current constraints have not been used. Generate when ready.'
-          : 'Six new directions. Select as they arrive.'}</p>
+          : 'Joker and Professional. Select as they arrive.'}</p>
       </footer>
     </aside>
   );
@@ -161,7 +162,7 @@ export function App() {
               {slot.style ? <StyleCard style={slot.style} active={selectedId === slot.id} inspired={slot.id === inspirationId} expression={slot.expression} onSelect={() => setSelectedId(slot.id)} onInspire={() => toggleInspiration(slot.id)} />
                 : <div className="generation-slot" role="status"><strong>{slot.id} · {slot.seed !== undefined ? 'Joker' : slot.expression ?? 'AI'}</strong>
                   <p>{slot.status === 'pending' ? 'Generating…' : slot.error}</p>
-                  {slot.status === 'error' && <button disabled={generation.active} onClick={() => retry(slot)} aria-label={`Retry ${slot.id}`}>Retry</button>}
+                  {slot.status === 'error' && <button disabled={generation.active || (slot.expression !== undefined && !ENABLED_EXPRESSIONS.includes(slot.expression))} onClick={() => retry(slot)} aria-label={`Retry ${slot.id}`}>Retry</button>}
                 </div>}
             </div>)}
             <div className="rail-bottom-note generated-note"><span aria-hidden="true">↟</span><p>New ideas<br />start here.</p></div>

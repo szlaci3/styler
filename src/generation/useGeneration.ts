@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { parseStyle, type Style } from '../../shared/style.ts';
 import type { Snapshot } from '../../shared/constraints.ts';
-import { EXPRESSIONS, AI_CONCURRENCY, captureGenerationSnapshot, type Expression, type GenerationSnapshot } from '../../shared/generation.ts';
+import { ENABLED_EXPRESSIONS, AI_CONCURRENCY, captureGenerationSnapshot, type Expression, type GenerationSnapshot } from '../../shared/generation.ts';
 import { seedStyle } from '../styles/presets.ts';
 import { makeJoker } from './joker.ts';
 import { requestStyle } from './requestStyle.ts';
@@ -27,7 +27,7 @@ export function useGeneration() {
       update(slot.id, { status: 'ready', style });
     } catch (error) {
       // Never echo arbitrary response content or transport error messages.
-      const known = ['Authentication failed.', 'Quota exceeded.', 'Provider unavailable.', 'Generation timed out.', 'Generation incomplete.', 'Invalid generated style.', 'Generation already active.', 'Generation capacity reached.', 'Missing server API key.', 'Invalid generation request.', 'Generated style violated captured constraints.'];
+      const known = ['Authentication failed.', 'Quota exceeded.', 'Provider unavailable.', 'Generation timed out.', 'Generation incomplete.', 'Invalid generated style.', 'Generation already active.', 'Generation capacity reached.', 'Missing server API key.', 'Invalid generation request.', 'Generated style violated captured constraints.', 'Generation expression temporarily disabled.'];
       const message = error instanceof Error && known.includes(error.message) ? error.message : 'Generation failed. Retry manually.';
       update(slot.id, { status: 'error', error: message });
     }
@@ -46,21 +46,21 @@ export function useGeneration() {
     guard.current = true; setActive(true);
     const seed = crypto.getRandomValues(new Uint32Array(1))[0]!;
     const joker: Slot = { id: `G${next.current++}`, context, seed, status: 'pending' };
-    const ai: Slot[] = EXPRESSIONS.map(expression => ({ id: `G${next.current++}`, context, expression, status: 'pending' }));
+    const ai: Slot[] = ENABLED_EXPRESSIONS.map(expression => ({ id: `G${next.current++}`, context, expression, status: 'pending' }));
     setSlots(old => [...old, joker, ...ai]);
     setScrollTarget(joker.id);
-    // Yield once so all six reserved positions can paint, independently of AI.
+    // Yield once so reserved positions can paint, independently of AI.
     const local = new Promise<void>(resolve => setTimeout(() => {
       try { update(joker.id, { status: 'ready', style: makeJoker(seed, context.constraints, joker.id, context.inspiration) }); }
       catch { update(joker.id, { status: 'error', error: 'Local Joker failed.' }); }
       finally { resolve(); }
     }, 0));
-    // Quick and additional work start together; completion of either frees a lane.
+    // Enabled AI work uses the configured lane bound.
     // Each remote call contains its own failure, so a failed card cannot stall siblings.
     void Promise.all([local, runAI(ai)]).finally(release);
   }
   function retry(slot: Slot) {
-    if (guard.current || slot.status !== 'error' || slot.seed !== undefined) return;
+    if (guard.current || slot.status !== 'error' || slot.seed !== undefined || (slot.expression && !ENABLED_EXPRESSIONS.includes(slot.expression))) return;
     guard.current = true; setActive(true);
     update(slot.id, { status: 'pending', error: undefined });
     void remote(slot).finally(release);

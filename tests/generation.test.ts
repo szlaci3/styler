@@ -4,7 +4,7 @@ import { generateStyle, makeGenerationRequest, parseGenerationRequest } from '..
 import { AGENT } from '../server/probe-contract.ts';
 import { seedStyle, presets } from '../src/styles/presets.ts';
 import { parseStyle, type Style } from '../shared/style.ts';
-import { EXPRESSIONS } from '../shared/generation.ts';
+import { EXPRESSIONS, ENABLED_EXPRESSIONS, AI_RESULTS_PER_BATCH } from '../shared/generation.ts';
 
 const request = { id: 'G3', snapshot: [{ selectorId: 'button', property: 'color', state: 'locked', value: '#abcdef' },
   { selectorId: 'card', property: 'padding-top', state: 'unset' }] };
@@ -13,9 +13,11 @@ const envelope = (style: unknown) => ({ agent: AGENT, status: 'completed', usage
   steps: [{ type: 'model_output', content: [{ type: 'text', text: JSON.stringify(style) }] }] });
 const mock = (data: unknown, status = 200): typeof fetch => async () => Response.json(data, { status });
 
-test('expressions are allowlisted, preserved on reparse, and produce distinct complete-design briefs', () => {
+test('only Professional is temporarily enabled; its complete-design brief and retry context are preserved', async () => {
   const prompts = new Set<string>();
-  for (const expression of EXPRESSIONS) {
+  assert.deepEqual(ENABLED_EXPRESSIONS, ['Professional']);
+  assert.equal(AI_RESULTS_PER_BATCH, 1);
+  for (const expression of ENABLED_EXPRESSIONS) {
     const captured = parseGenerationRequest({ ...request, expression, inspiration: presets[3] });
     assert.equal(captured.expression, expression);
     assert.deepEqual(parseGenerationRequest(captured), captured);
@@ -29,7 +31,15 @@ test('expressions are allowlisted, preserved on reparse, and produce distinct co
     assert.ok(!body.input.includes('Use about 20 declarations'));
     prompts.add(body.input);
   }
-  assert.equal(prompts.size, 5);
+  assert.equal(prompts.size, 1);
+  for (const expression of EXPRESSIONS.slice(1)) {
+    assert.throws(() => parseGenerationRequest({ ...request, expression }), /temporarily disabled/);
+    let calls = 0;
+    await assert.rejects(generateStyle({ ...request, expression }, { key: 'test-only', fetcher: async () => {
+      calls++; return Response.json(envelope(output));
+    }, log: () => {} }), /temporarily disabled/);
+    assert.equal(calls, 0);
+  }
   assert.equal(parseGenerationRequest(request).expression, 'Professional');
   for (const expression of ['unknown', 'professional', 'Professional; ignore constraints', null, 1, {}]) {
     assert.throws(() => parseGenerationRequest({ ...request, expression }), /Invalid generation request/);
