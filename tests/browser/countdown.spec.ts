@@ -20,12 +20,9 @@ test('browser-test server has no paid provider credential', async ({ request }) 
   const response = await request.post('/api/generate', { data: { id: 'G999', snapshot: [] } });
   expect(response.status()).toBe(503);
   expect(await response.json()).toEqual({ error: 'Missing server API key.' });
-  const disabled = await request.post('/api/generate', { data: { id: 'G999', snapshot: [], expression: 'Playful' } });
-  expect(disabled.status()).toBe(400);
-  expect(await disabled.json()).toEqual({ error: 'Generation expression temporarily disabled.' });
 });
 
-test('eight-second boundary, final 3/2/1 labels and one automatic Joker/Professional pair', async ({ page }) => {
+test('eight-second boundary, final 3/2/1 labels and one automatic six-slot batch', async ({ page }) => {
   const requests: ReturnType<typeof parseGenerationRequest>[] = [];
   await page.route('**/api/generate', async route => {
     const request = parseGenerationRequest(route.request().postDataJSON()); requests.push(request);
@@ -50,13 +47,13 @@ test('eight-second boundary, final 3/2/1 labels and one automatic Joker/Professi
   expect(requests).toHaveLength(0);
   await page.clock.runFor(1);
   await page.clock.runFor(10);
-  await expect(page.locator('[data-slot="G3"] .style-card')).toBeAttached();
+  await expect(page.locator('[data-slot="G7"] .style-card')).toBeAttached();
   await expect(generate).toHaveAccessibleName('Generate');
-  expect(requests).toHaveLength(1);
-  await expect(page.locator('[data-slot]')).toHaveCount(3);
+  expect(requests).toHaveLength(5);
+  await expect(page.locator('[data-slot]')).toHaveCount(7);
   for (const request of requests) expect(request.snapshot).toEqual([{ selectorId: 'button', property: 'color', state: 'locked', value: '#fcfbf7' }]);
   await page.clock.runFor(60_000);
-  expect(requests).toHaveLength(1);
+  expect(requests).toHaveLength(5);
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('S1');
 });
 
@@ -88,8 +85,8 @@ test('CSS states and cross-rail inspiration changes/clears reset one shared dead
   await page.getByRole('button', { name: 'Use G1 as inspiration', exact: true }).click(); // Clear via card
   await advance(7999, 'Sending in 1…');
   await page.clock.runFor(11);
-  await expect(page.locator('[data-slot="G3"] .style-card')).toBeAttached();
-  expect(requests).toHaveLength(1);
+  await expect(page.locator('[data-slot="G7"] .style-card')).toBeAttached();
+  expect(requests).toHaveLength(5);
   for (const request of requests) { expect(request.snapshot).toEqual([]); expect(request.inspiration).toBeNull(); }
 });
 
@@ -114,8 +111,8 @@ test('preview selection, hover, scrolling and sample controls do not arm or post
   await page.clock.runFor(1000);
   await expect(page.locator('.generate-button')).toHaveAccessibleName('Sending in 3…');
   await page.clock.runFor(3010);
-  await expect(page.locator('[data-slot="G3"] .style-card')).toBeAttached();
-  expect(calls).toBe(1);
+  await expect(page.locator('[data-slot="G7"] .style-card')).toBeAttached();
+  expect(calls).toBe(5);
   await expect(page.getByRole('textbox', { name: 'Email address' })).toHaveValue('countdown@example.com');
 });
 
@@ -131,15 +128,15 @@ test('manual Generate and manual Retry cancel pending countdowns without duplica
   await page.clock.runFor(10);
   await expect(page.getByRole('button', { name: 'Retry G3' })).toBeEnabled();
   await page.clock.runFor(60_000);
-  expect(calls).toBe(1);
+  expect(calls).toBe(5);
   await page.getByRole('button', { name: 'Unset card padding-top', exact: true }).click();
   await page.clock.runFor(6000);
   await expect(generate).toHaveAccessibleName('Sending in 2…');
   await page.getByRole('button', { name: 'Retry G3' }).click();
   await expect(page.getByRole('button', { name: 'Retry G3' })).toBeEnabled();
   await page.clock.runFor(60_000);
-  expect(calls).toBe(2);
-  await expect(page.locator('[data-slot]')).toHaveCount(3);
+  expect(calls).toBe(6);
+  await expect(page.locator('[data-slot]')).toHaveCount(7);
   await expect(generate).toHaveAccessibleName('Generate');
 });
 
@@ -155,21 +152,21 @@ test('active-batch edits never arm or queue a timer; a later fresh edit can star
   await openWithPausedClock(page);
   await page.getByRole('button', { name: 'Use S4 as inspiration', exact: true }).click();
   await page.clock.runFor(8010);
-  await expect.poll(() => requests.length).toBe(1);
+  await expect.poll(() => requests.length).toBe(2);
   await expect(page.locator('.generate-button')).toHaveAccessibleName('Generating…');
   await expect(page.locator('.generate-button')).toBeDisabled();
   await page.getByRole('button', { name: 'Lock button color', exact: true }).click();
   await page.getByRole('button', { name: 'Use S2 as inspiration', exact: true }).click();
   await page.clock.runFor(60_000);
-  expect(requests).toHaveLength(1);
+  expect(requests).toHaveLength(2);
   released = true; releases.forEach(resolve => resolve());
-  await expect(page.locator('[data-slot="G3"] .style-card')).toBeAttached();
+  await expect(page.locator('[data-slot="G7"] .style-card')).toBeAttached();
   await expect(page.locator('.generate-button')).toHaveAccessibleName('Generate');
   await page.clock.runFor(60_000);
-  expect(requests).toHaveLength(1);
+  expect(requests).toHaveLength(5);
   for (const request of requests) { expect(request.snapshot).toEqual([]); expect(request.inspiration?.id).toBe('S4'); }
   await page.getByRole('button', { name: 'Lock button color', exact: true }).click();
   await page.clock.runFor(8010);
-  await expect(page.locator('[data-slot="G5"] .style-card')).toBeAttached();
-  expect(requests).toHaveLength(2);
+  await expect(page.locator('[data-slot="G13"] .style-card')).toBeAttached();
+  expect(requests).toHaveLength(10);
 });

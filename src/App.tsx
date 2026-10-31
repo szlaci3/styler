@@ -52,7 +52,7 @@ function Inspector({ values, constraints, groups, onToggle, active, remaining, u
           ? 'Edits apply to the preview. This batch uses earlier constraints.'
           : remaining !== null && !active ? 'Sending eight seconds after the last constraint change.'
           : unusedConstraints ? 'Current constraints have not been used. Generate when ready.'
-          : 'Joker and Professional. Select as they arrive.'}</p>
+          : 'Joker and five AI expressions. Select as they arrive.'}</p>
       </footer>
     </aside>
   );

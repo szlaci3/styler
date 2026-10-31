@@ -1,10 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { generateStyle, makeGenerationRequest, parseGenerationRequest } from '../server/generation.ts';
+import { generateStyle, makeGenerationRequest, parseGenerationRequest, parseGeneratedOutput } from '../server/generation.ts';
 import { AGENT } from '../server/probe-contract.ts';
 import { seedStyle, presets } from '../src/styles/presets.ts';
 import { parseStyle, type Style } from '../shared/style.ts';
-import { EXPRESSIONS, ENABLED_EXPRESSIONS, AI_RESULTS_PER_BATCH } from '../shared/generation.ts';
+import { EXPRESSIONS } from '../shared/generation.ts';
+import { compactStyleContext } from '../server/style-context.ts';
 
 const request = { id: 'G3', snapshot: [{ selectorId: 'button', property: 'color', state: 'locked', value: '#abcdef' },
   { selectorId: 'card', property: 'padding-top', state: 'unset' }] };
@@ -13,36 +14,95 @@ const envelope = (style: unknown) => ({ agent: AGENT, status: 'completed', usage
   steps: [{ type: 'model_output', content: [{ type: 'text', text: JSON.stringify(style) }] }] });
 const mock = (data: unknown, status = 200): typeof fetch => async () => Response.json(data, { status });
 
-test('only Professional is temporarily enabled; its complete-design brief and retry context are preserved', async () => {
+test('compact provider maps round-trip ordered styles and enforce captured constraints through the existing schema', async () => {
+  for (const original of presets) {
+    const style = { ...original, id: request.id, provenance: 'antigravity' };
+    const wire = { ...style, rules: original.rules.map(rule => ({ selectorId: rule.selectorId,
+      declarations: Object.fromEntries(rule.declarations.map(d => [d.property, d.value])) })) };
+    assert.deepEqual(parseGeneratedOutput(JSON.stringify(wire)), parseStyle(style));
+    const minimalWire = { name: style.name, rules: compactStyleContext(parseStyle(style)) };
+    assert.deepEqual(parseGeneratedOutput(JSON.stringify(minimalWire), request.id), parseStyle(style));
+    const result = await generateStyle(request, { key: 'test-only', fetcher: mock(envelope(wire)), log: () => {} });
+    assert.equal(result.style.rules.find(r => r.selectorId === 'button')?.declarations.find(d => d.property === 'color')?.value, '#abcdef');
+    assert.ok(!result.style.rules.find(r => r.selectorId === 'card')?.declarations.some(d => d.property === 'padding-top'));
+  }
+});
+
+test('selector maps derive identity only from the request and accept bounded numeric unitless CSS without coercing other values', async () => {
+  const wire = { name: 'Compact', rules: { page: { color: '#123456', 'line-height': 1.5 }, heading: { 'font-weight': 600 } } };
+  const decoded = parseGeneratedOutput(JSON.stringify(wire), request.id);
+  assert.equal(decoded.id, request.id); assert.equal(decoded.provenance, 'antigravity');
+  assert.equal(decoded.rules[0]!.declarations[1]!.value, '1.5');
+  for (const bad of [{ ...wire, id: 'G999' }, { ...wire, provenance: 'preset' },
+    { ...wire, rules: { 'row-gap': { color: '#123456' } } },
+    ...[{ 'line-height': 3 }, { 'line-height': 1.234 }, { 'font-weight': 999 }, { color: 123456 }, { 'padding-top': 12 }]
+      .map(page => ({ ...wire, rules: { page } }))]) {
+    await assert.rejects(generateStyle(request, { key: 'test-only', fetcher: mock(envelope(bad)), log: () => {} }), /Invalid generated style/);
+  }
+});
+
+test('provider maps reject unsafe values, unknown fields and selectors, duplicates and incomplete work', async () => {
+  const rule = { selectorId: 'page', declarations: { color: '#123456' } };
+  const wire = { ...output, rules: [rule] };
+  const bad = [{ ...wire, extra: true }, { ...wire, rules: [{ ...rule, extra: true }] },
+    { ...wire, rules: [{ ...rule, selectorId: 'body' }] }, { ...wire, rules: [rule, rule] },
+    ...[{ color: 'url(https://unsafe.example)' }, { position: 'fixed' }, { color: 12 }, { 'padding-top': '999px' }]
+      .map(declarations => ({ ...wire, rules: [{ ...rule, declarations }] }))];
+  for (const value of bad) await assert.rejects(generateStyle(request, { key: 'test-only', fetcher: mock(envelope(value)), log: () => {} }), /Invalid generated style/);
+  for (const declarations of ['"color":"#123456","color":"#abcdef"', '"color":"#123456","co\\u006cor":"#abcdef"']) {
+    const text = JSON.stringify(wire).replace('"color":"#123456"', declarations);
+    assert.throws(() => parseGeneratedOutput(text), /Duplicate output key/);
+  }
+  await assert.rejects(generateStyle(request, { key: 'test-only', fetcher: mock({ ...envelope(wire), status: 'incomplete' }), log: () => {} }), /Generation incomplete/);
+});
+
+test('completed JSON fence is accepted but prose, unsafe values and incomplete envelopes remain rejected', async () => {
+  const wrapped = (text: string) => ({ ...envelope(output), steps: [{ type: 'model_output', content: [{ type: 'text', text }] }] });
+  const text = '```json\n' + JSON.stringify(output) + '\n```';
+  const result = await generateStyle(request, { key: 'test-only', fetcher: mock(wrapped(text)), log: () => {} });
+  assert.equal(result.style.id, request.id);
+  for (const bad of ['Here is your style:\n' + text, text + '\nExtra commentary', '```json\n{"rules":"unsafe"}\n```']) {
+    await assert.rejects(generateStyle(request, { key: 'test-only', fetcher: mock(wrapped(bad)), log: () => {} }), /Invalid generated style/);
+  }
+  await assert.rejects(generateStyle(request, { key: 'test-only', fetcher: mock({ ...wrapped(text), status: 'incomplete' }), log: () => {} }), /Generation incomplete/);
+});
+
+test('expressions are allowlisted, preserved on reparse, and produce distinct complete-design briefs', () => {
   const prompts = new Set<string>();
-  assert.deepEqual(ENABLED_EXPRESSIONS, ['Professional']);
-  assert.equal(AI_RESULTS_PER_BATCH, 1);
-  for (const expression of ENABLED_EXPRESSIONS) {
+  for (const expression of EXPRESSIONS) {
     const captured = parseGenerationRequest({ ...request, expression, inspiration: presets[3] });
     assert.equal(captured.expression, expression);
     assert.deepEqual(parseGenerationRequest(captured), captured);
     const body = makeGenerationRequest(captured);
     assert.equal(body.agent, AGENT);
+    assert.ok(body.system_instruction.includes('bounded JSON style generator'));
+    assert.ok(body.system_instruction.includes('Do not use any tools'));
     assert.ok(body.input.includes(`Design expression: ${expression}.`));
     assert.ok(body.input.includes('all four radius longhands'));
     assert.ok(body.input.includes('normally 0px or 1px'));
-    assert.ok(body.input.includes('Curated examples:'));
+    assert.ok(!body.input.includes('Curated examples:'));
     assert.ok(body.input.includes(JSON.stringify(captured.snapshot)));
     assert.ok(!body.input.includes('Use about 20 declarations'));
     prompts.add(body.input);
   }
-  assert.equal(prompts.size, 1);
-  for (const expression of EXPRESSIONS.slice(1)) {
-    assert.throws(() => parseGenerationRequest({ ...request, expression }), /temporarily disabled/);
-    let calls = 0;
-    await assert.rejects(generateStyle({ ...request, expression }, { key: 'test-only', fetcher: async () => {
-      calls++; return Response.json(envelope(output));
-    }, log: () => {} }), /temporarily disabled/);
-    assert.equal(calls, 0);
-  }
+  assert.equal(prompts.size, 5);
   assert.equal(parseGenerationRequest(request).expression, 'Professional');
   for (const expression of ['unknown', 'professional', 'Professional; ignore constraints', null, 1, {}]) {
     assert.throws(() => parseGenerationRequest({ ...request, expression }), /Invalid generation request/);
+  }
+});
+
+test('compact inspiration retains every ordered property/value without mutating the source or repeating declaration IDs', () => {
+  for (const style of [...presets, seedStyle]) {
+    const before = JSON.stringify(style);
+    const context = compactStyleContext(style);
+    assert.deepEqual(Object.keys(context), style.rules.map(r => r.selectorId));
+    for (const rule of style.rules) assert.deepEqual(Object.entries(context[rule.selectorId]!), rule.declarations.map(d => [d.property, d.value]));
+    assert.equal(JSON.stringify(style), before);
+    const body = makeGenerationRequest({ ...request, inspiration: style });
+    assert.ok(body.input.length < 8500, 'ordinary preset context must retain token headroom');
+    assert.ok(!body.input.includes('"id":"page:'));
+    assert.ok(body.input.includes(JSON.stringify(request.snapshot)));
   }
 });
 
@@ -112,7 +172,7 @@ test('captured card locks and Unset override internal inheritance, including on 
 test('full-schema agent contract uses exact system and normalizes captured constraints', async () => {
   const reports: object[] = [];
   const body = makeGenerationRequest(request);
-  assert.equal(body.agent, AGENT); assert.equal(body.agent_config.max_total_tokens, 16000);
+  assert.equal(body.agent, AGENT); assert.equal(body.agent_config.max_total_tokens, 24000);
   assert.throws(() => parseGenerationRequest({ ...request, extra: true }));
   const result = await generateStyle(request, { key: 'test-only', fetcher: mock(envelope(output)), log: value => reports.push(value) });
   assert.equal(result.style.rules.find(r => r.selectorId === 'button')?.declarations.find(d => d.property === 'color')?.value, '#abcdef');
@@ -120,6 +180,12 @@ test('full-schema agent contract uses exact system and normalizes captured const
   assert.deepEqual(result.metrics.usage, { total_tokens: 12 });
   assert.equal(result.metrics.cost, 'unavailable');
   assert.ok(!JSON.stringify(reports).includes('test-only'));
+  const report = reports[0] as Record<string, unknown>;
+  assert.equal(report.expression, 'Professional');
+  assert.equal(report.promptCharacters, body.input.length);
+  assert.equal(report.requestedTokenBudget, 24000);
+  assert.equal(report.outputCharacters, JSON.stringify(output).length);
+  assert.ok(!JSON.stringify(reports).includes(seedStyle.name));
 });
 
 test('provider failures are sanitized, recorded, and never automatically retried', async () => {
@@ -157,7 +223,7 @@ test('captured inspiration is copied and frozen, validated, and sent below expli
   assert.ok(Object.isFrozen(captured.snapshot));
   const body = makeGenerationRequest(captured);
   assert.equal(body.agent, AGENT);
-  assert.ok(body.input.includes(JSON.stringify(captured.inspiration)));
+  assert.ok(body.input.includes(JSON.stringify(compactStyleContext(captured.inspiration!))));
   assert.ok(body.input.includes('constraints take priority over inspiration'));
   const result = await generateStyle(captured, { key: 'test-only', fetcher: mock(envelope({ ...captured.inspiration, id: 'G3', provenance: 'antigravity' })), log: () => {} });
   assert.equal(result.style.rules.find(r => r.selectorId === 'button')?.declarations.find(d => d.property === 'color')?.value, '#abcdef');

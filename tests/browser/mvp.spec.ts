@@ -51,11 +51,11 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
 
     const generate = page.getByRole('button', { name: 'Generate', exact: true });
     await generate.focus(); await page.keyboard.press('Enter');
-    await expect(page.locator('[data-slot]')).toHaveCount(3);
+    await expect(page.locator('[data-slot]')).toHaveCount(7);
     await expect(page.locator('[data-slot="G2"] .style-card')).toBeVisible();
     await expect(page.locator('[data-slot="G3"]')).toContainText('Generating…');
     await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('S3');
-    await expect.poll(() => requests.length).toBe(1);
+    await expect.poll(() => requests.length).toBe(5);
     const captured = requests[0]!;
     expect(captured.snapshot).toEqual([
       { selectorId: 'button', property: 'background-color', state: 'locked', value: '#245b63' },
@@ -77,7 +77,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     await retry.focus(); await page.keyboard.press('Enter');
     await expect(page.locator('[data-slot="G3"] .style-card')).toBeVisible();
     expect(requests.filter(r => r.id === 'G3')[1]).toEqual(captured);
-    await expect(page.locator('[data-slot]')).toHaveCount(3);
+    await expect(page.locator('[data-slot]')).toHaveCount(7);
     await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G2');
     const ai = page.locator('[data-slot="G3"] .style-card');
     await ai.focus(); await page.keyboard.press('Space');
@@ -104,7 +104,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
 
     for (let index = 0; index < 3; index++) {
       await generate.click(); await expect(generate).toBeEnabled();
-      await expect(page.locator(`[data-slot="G${5 + index * 2}"] .style-card`)).toBeAttached();
+      await expect(page.locator(`[data-slot="G${13 + index * 6}"] .style-card`)).toBeAttached();
     }
     await page.getByRole('button', { name: `G1: ${seedStyle.name} (seed)`, exact: true }).click();
     const rail = page.getByRole('region', { name: 'Scrollable generated styles', exact: true });
@@ -112,8 +112,8 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     const otherRails = page.locator('.preview-scroll, .style-panel:not(.generated-panel) .rail-scroll, .inspector-scroll');
     const positions = await otherRails.evaluateAll(elements => elements.map(element => element.scrollTop));
     await generate.focus(); await page.keyboard.press('Enter');
-    await expect(page.locator('[data-slot]')).toHaveCount(11);
-    await expect(page.locator('[data-slot="G10"]')).toBeInViewport();
+    await expect(page.locator('[data-slot]')).toHaveCount(31);
+    await expect(page.locator('[data-slot="G26"]')).toBeInViewport();
     await expect.poll(() => rail.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
     expect(await otherRails.evaluateAll(elements => elements.map(element => element.scrollTop))).toEqual(positions);
     await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G1');
@@ -151,11 +151,11 @@ test('page load and preview interactions never generate; manual send cancels cou
   await expect(page.locator('[data-slot="G3"]')).toContainText('Generation timed out.');
   await page.getByRole('button', { name: 'S1: Tidal Atelier', exact: true }).click();
   await page.clock.fastForward(60_000);
-  expect(calls).toBe(1);
-  await expect(page.locator('[data-slot]')).toHaveCount(3);
+  expect(calls).toBe(5);
+  await expect(page.locator('[data-slot]')).toHaveCount(7);
   await page.reload();
   await page.clock.fastForward(60_000);
   await expect(page.locator('[data-slot]')).toHaveCount(1);
   await expect(lock).toHaveAttribute('aria-pressed', 'false');
-  expect(calls).toBe(1);
+  expect(calls).toBe(5);
 });

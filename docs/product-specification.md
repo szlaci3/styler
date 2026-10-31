@@ -408,6 +408,8 @@ Follow-on decision (2026-10-31): the quick AI slot uses the **Professional** exp
 
 Temporary reliability decision (2026-10-31, supersedes the active count above): enable only **Joker and Professional**. Keep the four other expression definitions for later re-enabling, but create no slots or requests for them and reject disabled expressions at the server. Existing accepted history remains browsable. All inspiration, lock/Unset, countdown and manual-retry behavior remains; retry cannot start a disabled expression.
 
+Subsequent reliability investigation (2026-10-31, supersedes the temporary count): restore **Joker plus all five AI expressions**. The user authorizes live experiments with prompt size, requested output size, token budget, concurrency and pacing to improve completed, validated Antigravity responses and document observed limits. Preserve the exact agent, captured constraints, manual retry and progressive delivery. Measurements and the selected operating profile belong in `antigravity-reliability.md`; finite samples do not guarantee provider availability.
+
 The Joker should appear essentially immediately.
 
 The quick AI result should ideally arrive before the four additional styles.

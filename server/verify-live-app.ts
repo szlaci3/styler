@@ -49,7 +49,7 @@ try {
     if (!entry) return;
     active.delete(response.request());
     void (async () => {
-      const sample: Record<string, unknown> = { slot: entry.captured.id, httpStatus: response.status(), valid: false,
+      const sample: Record<string, unknown> = { slot: entry.captured.id, expression: entry.captured.expression, httpStatus: response.status(), valid: false,
         startOffsetMs: Math.round(entry.start - started), completionOffsetMs: Math.round(performance.now() - started) };
       try {
         const data: unknown = await response.json();
@@ -87,10 +87,12 @@ try {
   await Promise.race([allResponses, new Promise<never>((_, reject) => { deadline = setTimeout(() => reject(new Error('Live batch verification timed out.')), 310_000); })]);
   clearTimeout(deadline);
   await page.getByRole('button', { name: 'Generate', exact: true }).waitFor();
+  const readyCards = await page.locator('[data-slot] .style-card').count();
   const generatedSlots = await page.locator('[data-slot]').count();
   const contexts = [...requests.values()].map(({ captured }) => JSON.stringify({ constraints: captured.snapshot, inspiration: captured.inspiration }));
   evidence.requestCount = requests.size;
   evidence.generatedSlots = generatedSlots;
+  evidence.readyCards = readyCards;
   evidence.peakConcurrentRequests = peak;
   evidence.sharedSnapshotValid = contexts.length === AI_RESULTS_PER_BATCH && new Set(contexts).size === 1;
   evidence.firstAIReadyMs = Math.min(...samples.map(sample => Number(sample.completionOffsetMs)));
@@ -101,7 +103,7 @@ try {
   if (firstValid) await page.locator(`[data-slot="${firstValid.slot}"] .style-card`).click();
   await mkdir('verification-results', { recursive: true });
   await page.screenshot({ path: 'verification-results/m15-live-batch.png' });
-  if (requests.size !== AI_RESULTS_PER_BATCH || generatedSlots !== AI_RESULTS_PER_BATCH + 2 || peak > AI_CONCURRENCY || !evidence.sharedSnapshotValid
+  if (requests.size !== AI_RESULTS_PER_BATCH || generatedSlots !== AI_RESULTS_PER_BATCH + 2 || readyCards !== AI_RESULTS_PER_BATCH + 2 || peak > AI_CONCURRENCY || !evidence.sharedSnapshotValid
     || samples.some(sample => !sample.valid || !sample.inspirationSnapshotValid)) throw new Error('Live batch had failed slots or violated acceptance checks; evidence retained.');
 } catch (error) {
   evidence.error = error instanceof Error ? error.message : 'Live batch verification failed.';

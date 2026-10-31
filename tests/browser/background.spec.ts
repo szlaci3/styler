@@ -3,7 +3,7 @@ import { parseGenerationRequest } from '../../server/generation.ts';
 import { constrainStyle } from '../../shared/constraints.ts';
 import { seedStyle } from '../../src/styles/presets.ts';
 
-test('background polling survives a minute, retains the Professional request and captured inputs, and retries only manually', async ({ page }) => {
+test('background polling survives a minute, retains two lanes and captured inputs, and retries only manually', async ({ page }) => {
   const requests: ReturnType<typeof parseGenerationRequest>[] = [];
   const jobs = new Map<string, ReturnType<typeof parseGenerationRequest>>();
   let ready = false, polls = 0;
@@ -32,21 +32,23 @@ test('background polling survives a minute, retains the Professional request and
   await page.getByRole('button', { name: 'Lock button background-color', exact: true }).click();
   await generate.click();
   await page.clock.runFor(10);
-  await expect.poll(() => requests.length).toBe(1);
+  await expect.poll(() => requests.length).toBe(2);
   await page.getByRole('button', { name: 'Use S2 as inspiration', exact: true }).click();
   // Let each mocked network read finish before advancing past its fetch timeout.
   for (let tick = 0; tick < 35; tick++) {
     await page.clock.runFor(2000);
-    await expect.poll(() => polls).toBeGreaterThanOrEqual(tick + 1);
+    await expect.poll(() => polls).toBeGreaterThanOrEqual((tick + 1) * 2);
     await page.evaluate(() => Promise.resolve());
   }
   await expect.poll(() => polls).toBeGreaterThan(1);
-  expect(requests).toHaveLength(1);
+  expect(requests).toHaveLength(2);
   await expect(generate).toBeDisabled();
   await expect(page.locator('[data-slot="G2"] .style-card')).toBeAttached();
   ready = true;
-  await page.clock.runFor(2010);
-  expect(requests).toHaveLength(1);
+  for (let wave = 0; wave < 3; wave++) {
+    await page.clock.runFor(2010);
+    await expect.poll(() => requests.length).toBe(Math.min(5, 4 + wave));
+  }
   await expect(generate).toBeEnabled();
   await expect(page.getByRole('button', { name: 'Retry G3', exact: true })).toBeEnabled();
   for (const request of requests) {
@@ -55,17 +57,17 @@ test('background polling survives a minute, retains the Professional request and
   }
   await expect(page.getByRole('status', { name: 'Generation constraints', exact: true })).toContainText('have not been used');
   await page.clock.runFor(60_000);
-  expect(requests).toHaveLength(1);
+  expect(requests).toHaveLength(5);
   const finalPolls = polls;
   await page.clock.runFor(10_000);
   expect(polls).toBe(finalPolls);
   await page.getByRole('button', { name: 'Retry G3', exact: true }).click();
-  await expect.poll(() => requests.length).toBe(2);
+  await expect.poll(() => requests.length).toBe(6);
   await page.clock.runFor(2010);
   await expect(generate).toBeEnabled();
   await expect(page.locator('[data-slot="G3"] .style-card')).toBeAttached();
-  expect(requests[1]).toEqual(requests[0]);
-  await expect(page.locator('[data-slot]')).toHaveCount(3);
+  expect(requests[5]).toEqual(requests[0]);
+  await expect(page.locator('[data-slot]')).toHaveCount(7);
 });
 
 test('malformed background acknowledgements and failed status reads do not resubmit paid requests', async ({ page }) => {
@@ -77,7 +79,7 @@ test('malformed background acknowledgements and failed status reads do not resub
   await page.goto('/');
   await page.locator('.generate-button').click();
   await expect(page.getByRole('button', { name: 'Retry G3', exact: true })).toBeEnabled();
-  expect(calls).toBe(1);
+  expect(calls).toBe(5);
   await expect(page.locator('[data-slot="G3"]')).toContainText('Invalid generated style.');
   await page.route('**/api/generate', async route => {
     calls++;
@@ -86,6 +88,6 @@ test('malformed background acknowledgements and failed status reads do not resub
   await page.route('**/api/generation-status?*', async route => { await route.abort('failed'); });
   await page.getByRole('button', { name: 'Retry G3', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Retry G3', exact: true })).toBeEnabled();
-  expect(calls).toBe(2);
+  expect(calls).toBe(6);
   await expect(page.locator('[data-slot="G3"]')).toContainText('Generation failed. Retry manually.');
 });
