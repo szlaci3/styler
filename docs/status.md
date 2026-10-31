@@ -9,6 +9,7 @@ Last updated: 2026-10-31 (Europe/Brussels).
 - The original roadmap ends at M18. The user subsequently authorized backend migration to Netlify and explicitly chose background generation. **The migration is implemented and locally verified; no hosted deployment has been performed.** V2 remains deferred.
 - Existing ignored GEMINI_API_KEY is authorized for integration, server-side only. Exact agent remains antigravity-preview-09-2026.
 - Follow-on request on 2026-10-31: internally copy only `.sample-card` border colors and padding into new Antigravity results from captured inspiration, with per-declaration G1 fallback. Explicit locks and Unset remain authoritative. No UI controls or Joker changes; other AI card properties remain generated. User requested commit and push to main.
+- Subsequent request on 2026-10-31: Joker takes all supported colors, including shadow colors, from captured inspiration with per-declaration G1 fallback. Each RGB channel varies independently by at most 20, clamped to 0–255; alpha stays unchanged. Locks and Unset take priority. Commit and push to main authorized.
 
 ## Working implementation
 
@@ -18,7 +19,7 @@ Last updated: 2026-10-31 (Europe/Brussels).
 - Free/Locked/Unset controls capture browser values, retain locks across selection, and keep original style records intact. Unset clears the live lock and omits the declaration in later results.
 - Canonical lock source order is independent of click order. Browser specificity and inheritance remain native.
 - Exclusive accessible inspiration controls work across presets/seed/Joker/AI cards, independently of preview selection. A footer control clears inspiration. Generation and manual retry retain the captured original inspiration style and constraints; locks/Unset take priority.
-- Deterministic seeded Joker respects the frozen validated snapshot and uses inspiration typography/palette/shape when supplied.
+- Deterministic seeded Joker respects the frozen validated snapshot and uses inspiration typography/shape when supplied. Colors always follow captured inspiration or G1 within ±20 per RGB channel, including backgrounds, borders, text and shadows; alpha is preserved. Missing inspiration colors fall back individually to G1. Non-color variation remains active.
 - Manual or countdown-triggered Generate reserves six ordered slots (Joker, quick AI, four additional AI), runs at most two AI requests simultaneously, delivers each result independently, scrolls only the generated rail to the batch start, preserves all session history, and never auto-selects.
 - Server-only POST /api/generate uses the exact Interactions agent, validates request/output, normalizes locks/omissions, and records content-free outcome, latency, validity, and exposed usage.
 - One shared eight-second countdown starts/resets only on CSS/inspiration changes. Final labels show Sending in 3/2/1…. Manual Generate/Retry cancel it; load and preview interactions do not arm or reset it. Active-batch edits never arm/queue a timer, and completion does not auto-send.
@@ -27,6 +28,8 @@ Last updated: 2026-10-31 (Europe/Brussels).
 - Netlify configuration builds the frontend and deploys start/health, signed background worker, status and hourly-cleanup functions. Strongly consistent Blobs holds temporary job state; atomic claims prevent duplicate deliveries from repeating paid work. Provider deadline remains 90 seconds; job/polling deadline is 150 seconds. Visible history remains session-only.
 
 ## Verification
+
+2026-10-31 Joker palette follow-on: **32 offline tests passed**, including 1,500 seeded palette cases across all presets/G1 fallback and shorthand/full/alpha hex, channel edge limits, sparse inspiration, shadow colors, palette consistency, immutable originals and lock/Unset priority. **49 Edge checks passed** with mocked provider responses; **app build** and **git diff --check** passed. No paid request or hosted verification was performed. The Joker request is complete; hosted verification remains separate.
 
 2026-10-31 card-treatment follow-on: **29 offline tests passed**, including inspiration/G1 per-declaration fallback, missing card rules, preservation of all other AI properties, captured-context retry, lock/Unset priority, immutability and rejection of unsafe card values before normalization. **49 Edge checks passed** using mocked provider responses; **app build**, **Netlify function packaging**, and **git diff --check** passed. No paid request or hosted verification was performed for this change. The requested implementation is complete; hosted deployment verification remains the next separate action below.
 
