@@ -8,6 +8,7 @@ import { toggleConstraint, type Snapshot } from '../shared/constraints.ts';
 import { makeInspectionGroups, representative, normalizeComputed, type InspectionGroup } from './preview/inspection.ts';
 import { Preview } from './preview/Preview.tsx';
 import { ENABLED_EXPRESSIONS } from '../shared/generation.ts';
+import { IntroductionVideo } from './components/IntroductionVideo.tsx';
 
 function Inspector({ values, constraints, groups, onToggle, active, remaining, unusedConstraints, onGenerate, inspirationId, onClearInspiration }: { values: Record<string, string>; constraints: Snapshot; groups: readonly InspectionGroup[];
   remaining: number | null;
@@ -128,7 +129,7 @@ export function App() {
           <span className="app-logo" aria-hidden="true">s<span>.</span></span><h1>styler<span>.</span></h1>
           <span className="app-header-divider" /><span className="app-tagline">A space for visual possibility.</span>
         </div>
-        <span className="app-session"><span /> Local session</span>
+        <IntroductionVideo />
       </header>
       <main className="workspace" aria-label="Style exploration workspace">
         <section className="preview-panel workspace-panel" aria-labelledby="preview-label">
