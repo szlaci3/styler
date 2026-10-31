@@ -1,0 +1,108 @@
+{
+  "width": 1600,
+  "height": 1000,
+  "fps": 20,
+  "durationSeconds": 43.1,
+  "waitOmittedSeconds": 35.2,
+  "responses": [
+    {
+      "status": 200
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "chapters": [
+    {
+      "seconds": 0,
+      "text": "Styler — explore a new look for the same website."
+    },
+    {
+      "seconds": 5,
+      "text": "Choose a preset. Colors, type and surfaces change together."
+    },
+    {
+      "seconds": 10,
+      "text": "Use a design as inspiration, then generate fresh variations."
+    },
+    {
+      "seconds": 16,
+      "text": "Joker and Harlequin arrive instantly."
+    },
+    {
+      "seconds": 20,
+      "text": "Four AI styles finish in a minute or two:"
+    },
+    {
+      "seconds": 25,
+      "text": "Professional, Playful, Commercial and Artistic."
+    },
+    {
+      "seconds": 37,
+      "text": "Different interpretations of the same inspiration."
+    }
+  ],
+  "provider": "antigravity-preview-09-2026",
+  "source": "real local application; no mocked generation",
+  "recording": "UI captured as PNG frames; holds and cursor timing edited; no frames captured during AI wait",
+  "captureChapters": [
+    {
+      "seconds": 0,
+      "text": "Styler — explore a new look for the same website."
+    },
+    {
+      "seconds": 3,
+      "text": "Choose a preset. Colors, type and surfaces change together."
+    },
+    {
+      "seconds": 12.2,
+      "text": "Scroll the preview to bring both studio illustrations into view."
+    },
+    {
+      "seconds": 16.7,
+      "text": "Use this design as inspiration, then generate fresh variations."
+    },
+    {
+      "seconds": 18.5,
+      "text": "Joker and Harlequin arrive instantly. Four AI styles are on their way."
+    },
+    {
+      "seconds": 20.5,
+      "text": "All four AI styles are ready. Explore each result."
+    },
+    {
+      "seconds": 22.5,
+      "text": "Professional — a different interpretation of the same inspiration."
+    },
+    {
+      "seconds": 26.9,
+      "text": "Playful — a different interpretation of the same inspiration."
+    },
+    {
+      "seconds": 31.3,
+      "text": "Commercial — a different interpretation of the same inspiration."
+    },
+    {
+      "seconds": 35.7,
+      "text": "Artistic — a different interpretation of the same inspiration."
+    },
+    {
+      "seconds": 40.1,
+      "text": "Compare ideas. Keep exploring. Find your style."
+    }
+  ],
+  "subtitleStyle": {
+    "color": "#000",
+    "background": "#bbb",
+    "padding": 12,
+    "sizing": "fits text",
+    "fontSize": 28
+  }
+}

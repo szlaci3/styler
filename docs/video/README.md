@@ -1,0 +1,9 @@
+# Styler introduction video
+
+`styler-introduction.mp4` follows the Formlane introduction's captioned UI-demo format, with a visible cursor and click feedback. The real local application supplies every pictured state. The opening compares S1/S2/S3, scrolls the preview until both illustrations appear at the bottom, selects S1 as inspiration, and explicitly generates one batch. Recording pauses during the AI wait and resumes only after all four requests succeed, then compares Professional, Playful, Commercial and Artistic.
+
+Capture uses browser screenshots with edited holds and cursor movement, encoded as a silent H.264 MP4 at 1600 × 1000, 20 fps. A separate caption strip keeps text clear of application controls. Application source is unchanged. `recording.json` contains timing, response counts and chapter evidence; PNGs provide visual checkpoints.
+
+Revised subtitles start at 0, 5, 10, 16, 20, 25 and 37 seconds, with the last caption continuing to the end. Black text appears on a #bbb rectangle sized to the text with 12px padding. `scripts/subtitle-introduction.mjs` applies this edit to existing footage without provider requests; the capture script also applies it after new recordings. Set `FFMPEG_PATH` and run `node scripts/subtitle-introduction.mjs` to apply subtitles again. Original capture chapters remain in `recording.json`; checkpoint PNGs show the original capture before subtitle revision.
+
+To recreate, start `npm run dev`, set `FFMPEG_PATH` to an FFmpeg executable with libx264, then run `node scripts/record-introduction.mjs`. Optional `STYLER_VIDEO_URL` chooses a different local server. Edge must be installed. **Each run makes four real provider requests using the server's existing credentials.** No fallback, mocked result or automatic retry is used. Failed batches stop the script. Re-running overwrites video artifacts and makes a new batch.

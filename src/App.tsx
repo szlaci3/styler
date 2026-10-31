@@ -21,7 +21,8 @@ function Inspector({ values, constraints, groups, onToggle, active, remaining, u
         <span className="inspector-code-icon" aria-hidden="true">{'{ }'}</span>
       </header>
       <div className="inspector-description">
-        <span className="inspector-mode-dot" /> Effective CSS <span className="read-only-badge">Live constraints</span>
+        <p>L - Locks a line, to be applied in preview and in generations.</p>
+        <p>U - Unsets a line, so it's not used in generations.</p>
       </div>
       <div className="inspector-scroll scroll-region" tabIndex={0} role="region" aria-label="Scrollable CSS declarations">
         {groups.map(rule => (

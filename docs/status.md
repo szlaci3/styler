@@ -2,6 +2,16 @@
 
 Last updated: 2026-10-31 (Europe/Brussels).
 
+## CSS control explanations (2026-10-31)
+
+Replaced the inspector's Effective CSS / Live constraints badge row with two plain-text explanations requested by the user: “L - Locks a line, to be applied in preview and in generations.” and “U - Unsets a line, so it's not used in generations.” Each explanation starts on its own line and can wrap within the inspector. Removed the badge styling; declaration behavior is unchanged. Build/typecheck and `git diff --check` pass. No browser verification, provider request or deployment performed. This UI correction is complete; hosted verification remains a separate next action.
+
+## Introduction video (2026-10-31)
+
+Subtitle revision: final MP4 uses the user's 0/5/10/16/20/25/37-second timing and revised English, with black text and a text-sized #bbb background. Existing footage was reused without further provider requests. Visual checkpoint at 25 seconds, full MP4 decode, script syntax, build/typecheck and diff checks passed. User authorized committing and pushing to main, including the already-staged inspector help text.
+
+Created `docs/video/styler-introduction.mp4`, a 43.1-second captioned desktop demonstration matching Formlane's cursor/caption format. It compares presets, scrolls both studio illustrations into view at the bottom, selects S1 inspiration, triggers generation, omits the 35.2-second remaining AI wait, then selects all four completed AI results. One real local batch returned four HTTP 200 responses with no browser errors; no mocked results, retries or fallback. H.264 1600×1000/20 fps metadata and full FFmpeg decode passed, and preview/result screenshots were visually inspected. Reusable capture script and evidence are documented in `docs/video/README.md`. Application behavior is unchanged; no deployment or commit was performed.
+
 ## Authority and scope
 
 - Latest UI correction on 2026-10-31: match card-swatch button colors to the preview when generated declarations are omitted, remove all rail captions, increase card-wrapper bottom margins to 18px, and show one centered name (S1–S7/G1) or expression (generated cards). Commit and push authorized.
