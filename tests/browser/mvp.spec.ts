@@ -106,7 +106,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
       await generate.click(); await expect(generate).toBeEnabled();
       await expect(page.locator(`[data-slot="G${13 + index * 6}"] .style-card`)).toBeAttached();
     }
-    await page.getByRole('button', { name: 'G1: Foundation seed (seed)', exact: true }).click();
+    await page.getByRole('button', { name: `G1: ${seedStyle.name} (seed)`, exact: true }).click();
     const rail = page.getByRole('region', { name: 'Scrollable generated styles', exact: true });
     await rail.evaluate(element => { element.scrollTop = 0; });
     const otherRails = page.locator('.preview-scroll, .style-panel:not(.generated-panel) .rail-scroll, .inspector-scroll');

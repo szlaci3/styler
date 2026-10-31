@@ -77,7 +77,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     const generate = page.getByRole('button', { name: 'Generate', exact: true });
     for (let index = 0; index < 3; index++) { await generate.click(); await expect(generate).toBeEnabled(); }
     await expect(page.locator('[data-slot]')).toHaveCount(19);
-    await page.getByRole('button', { name: 'G1: Foundation seed (seed)', exact: true }).click();
+    await page.getByRole('button', { name: `G1: ${seedStyle.name} (seed)`, exact: true }).click();
     const rail = page.getByRole('region', { name: 'Scrollable generated styles', exact: true });
     await rail.evaluate(el => { el.scrollTop = 0; });
     const otherRails = page.locator('.preview-scroll, .style-panel:not(.generated-panel) .rail-scroll, .inspector-scroll');

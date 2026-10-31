@@ -51,5 +51,20 @@ export const presets = Object.freeze(themes.map(theme => parseStyle({
   ],
 })));
 
-// Honest initial reference, using the same validated representation as presets.
-export const seedStyle = parseStyle({ ...presets[0], id: 'G1', name: 'Foundation seed', provenance: 'seed' });
+// Independently designed seed and shared generation fallback, distinct from S1.
+export const seedStyle = parseStyle({
+  schemaVersion: 1, id: 'G1', name: 'Tidal Atelier', provenance: 'seed', rules: [
+    rule('page', { color: '#213e43', 'background-color': '#edf3f2', 'font-family': 'Georgia, serif', ...padding(32) }),
+    rule('heading', { 'font-family': 'Georgia, serif', 'font-size': '56px', 'font-weight': '400', 'line-height': '1.08', 'letter-spacing': '-1.8px' }),
+    rule('accent', { color: '#a64e36', 'font-style': 'italic', 'font-weight': '400' }),
+    rule('copy', { color: '#53676a', 'font-size': '13px', 'line-height': '1.7' }),
+    rule('button', { color: '#fcfbf7', 'background-color': '#245b63', 'font-family': "'Segoe UI', Arial, sans-serif", ...radius(10), ...padding(12, 18), ...border(1, '#245b63') }),
+    rule('card', { color: '#213e43', 'background-color': '#fffcf6', ...radius(18), ...padding(18), ...border(1, '#c9d7d4'), 'box-shadow': '0px 6px 20px 0px #213e4310' }),
+    rule('input', { color: '#213e43', 'background-color': '#fffdf8', ...radius(8), ...padding(12, 14), ...border(1, '#b8c9c5') }),
+    rule('eyebrow', { color: '#9a4933' }),
+    rule('details', { color: '#53676a' }),
+    rule('switch', { 'background-color': '#245b63' }),
+    rule('subheading', { 'font-family': 'Georgia, serif', 'font-size': '26px', 'font-weight': '400', 'line-height': '1.2', 'letter-spacing': '-0.6px' }),
+    rule('image', { ...radius(10), ...border(1, '#d6ded8') }),
+  ],
+});

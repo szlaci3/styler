@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { presets } from '../../src/styles/presets.ts';
+import { presets, seedStyle } from '../../src/styles/presets.ts';
 
 const rgb = (hex: string) => `rgb(${[1, 3, 5].map(offset => Number.parseInt(hex.slice(offset, offset + 2), 16)).join(', ')})`;
 const value = (style: typeof presets[number], selectorId: string, property: string) =>
@@ -47,10 +47,10 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 1920, height: 108
       await page.getByRole('region', { name: 'Scrollable website preview' }).evaluate(element => { element.scrollTop = 0; });
       if (viewport.width === 1440) await page.screenshot({ path: `test-results/m3-${style.id}.png` });
     }
-    await page.getByRole('button', { name: 'G1: Foundation seed (seed)', exact: true }).click();
-    await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('Foundation seed');
+    await page.getByRole('button', { name: `G1: ${seedStyle.name} (seed)`, exact: true }).click();
+    await expect(page.getByRole('status', { name: 'Selected style' })).toContainText(seedStyle.name);
     await expect(page.locator('.style-card[aria-pressed="true"]')).toHaveCount(1);
-    await expect(website).toHaveCSS('background-color', rgb(value(presets[0]!, 'page', 'background-color')));
+    await expect(website).toHaveCSS('background-color', rgb(value(seedStyle, 'page', 'background-color')));
     expect(external).toEqual([]);
     expect(errors).toEqual([]);
   });

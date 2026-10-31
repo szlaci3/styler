@@ -10,10 +10,11 @@ Last updated: 2026-10-31 (Europe/Brussels).
 - Existing ignored GEMINI_API_KEY is authorized for integration, server-side only. Exact agent remains antigravity-preview-09-2026.
 - Follow-on request on 2026-10-31: internally copy only `.sample-card` border colors and padding into new Antigravity results from captured inspiration, with per-declaration G1 fallback. Explicit locks and Unset remain authoritative. No UI controls or Joker changes; other AI card properties remain generated. User requested commit and push to main.
 - Subsequent request on 2026-10-31: Joker takes all supported colors, including shadow colors, from captured inspiration with per-declaration G1 fallback. Each RGB channel varies independently by at most 20, clamped to 0–255; alpha stays unchanged. Locks and Unset take priority. Commit and push to main authorized.
+- Subsequent G1 design request on 2026-10-31: replace the S1 duplicate with an independent harmonious seed. G1 is now Tidal Atelier: mineral-blue page, ivory cards, deep teal buttons, terracotta accents, serif headings, rounded surfaces and soft shadows. It remains the shared generation fallback; S1 stays Foundation.
 
 ## Working implementation
 
-- Local React/TypeScript desktop app with seven immutable presets and an honest selectable G1 seed. The expanded Form & Field preview includes local illustrations, navigation, memberships, a validated local visit form with dropdowns/notes, and native FAQs. Content/control state survives all preset changes.
+- Local React/TypeScript desktop app with seven immutable presets and an independently designed selectable G1 seed, Tidal Atelier. The expanded Form & Field preview includes local illustrations, navigation, memberships, a validated local visit form with dropdowns/notes, and native FAQs. Content/control state survives all preset changes.
 - Persistent ShadowRoot preview retains DOM/control state and isolates app chrome. Selected and locks styles use native CSS layers with reduced-motion support. Enabling reduced motion cancels existing transitions as well as preventing new ones.
 - Effective inspector reads canonical rendered representatives, including inherited/default values, and retains rows discovered in accepted generated history. Conditional switch selector reads its track even when unchecked. Fractional font weights during transitions can be captured within the 400–800 bound.
 - Free/Locked/Unset controls capture browser values, retain locks across selection, and keep original style records intact. Unset clears the live lock and omits the declaration in later results.
@@ -28,6 +29,8 @@ Last updated: 2026-10-31 (Europe/Brussels).
 - Netlify configuration builds the frontend and deploys start/health, signed background worker, status and hourly-cleanup functions. Strongly consistent Blobs holds temporary job state; atomic claims prevent duplicate deliveries from repeating paid work. Provider deadline remains 90 seconds; job/polling deadline is 150 seconds. Visible history remains session-only.
 
 ## Verification
+
+2026-10-31 independent G1 design: **32 offline tests passed**, **49 Edge checks passed**, and **app build**, **Netlify function packaging**, and **git diff --check** passed. Visual QA inspected the G1 hero/cards at 1440px and membership cards at 1280px; a separate Edge capture covered 1280/1440/1920px with no preview horizontal overflow or generation requests. Browser journeys now use G1's own name/background instead of assuming S1 equivalence. No paid request or hosted verification occurred. The G1 design request is complete; hosted verification remains separate.
 
 2026-10-31 Joker palette follow-on: **32 offline tests passed**, including 1,500 seeded palette cases across all presets/G1 fallback and shorthand/full/alpha hex, channel edge limits, sparse inspiration, shadow colors, palette consistency, immutable originals and lock/Unset priority. **49 Edge checks passed** with mocked provider responses; **app build** and **git diff --check** passed. No paid request or hosted verification was performed. The Joker request is complete; hosted verification remains separate.
 
