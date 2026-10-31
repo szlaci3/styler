@@ -54,7 +54,7 @@ export type Declaration = Readonly<{ id: string; property: Property; value: stri
 export type StyleRule = Readonly<{ selectorId: SelectorId; declarations: readonly Declaration[] }>;
 export type Style = Readonly<{
   schemaVersion: 1; id: string; name: string;
-  provenance: 'preset' | 'seed' | 'joker' | 'antigravity';
+  provenance: 'preset' | 'seed' | 'joker' | 'harlequin' | 'antigravity';
   rules: readonly StyleRule[];
 }>;
 
@@ -76,7 +76,7 @@ export function parseStyle(input: unknown): Style {
   if (!record(input) || !keys(input, ['schemaVersion', 'id', 'name', 'provenance', 'rules'])) invalid();
   if (input.schemaVersion !== 1 || typeof input.id !== 'string' || !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(input.id)) invalid();
   if (typeof input.name !== 'string' || !/^[\p{L}\p{N} .'-]{1,64}$/u.test(input.name) || !input.name.trim()) invalid();
-  if (!['preset', 'seed', 'joker', 'antigravity'].includes(input.provenance as string)) invalid();
+  if (!['preset', 'seed', 'joker', 'harlequin', 'antigravity'].includes(input.provenance as string)) invalid();
   if (!Array.isArray(input.rules) || input.rules.length > Object.keys(selectors).length) invalid();
   const seenSelectors = new Set<string>();
   const rules = input.rules.map((rule: unknown): StyleRule => {

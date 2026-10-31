@@ -410,6 +410,8 @@ Temporary reliability decision (2026-10-31, supersedes the active count above): 
 
 Subsequent reliability investigation (2026-10-31, supersedes the temporary count): restore **Joker plus all five AI expressions**. The user authorizes live experiments with prompt size, requested output size, token budget, concurrency and pacing to improve completed, validated Antigravity responses and document observed limits. Preserve the exact agent, captured constraints, manual retry and progressive delivery. Measurements and the selected operating profile belong in `antigravity-reliability.md`; finite samples do not guarantee provider availability.
 
+Latest batch decision (2026-10-31, supersedes the counts above): append **six cards** in order: **Joker**, **Harlequin**, quick AI **Professional**, then **Playful**, **Commercial**, and **Artistic**. Joker remains local with ±20 per RGB channel; Harlequin is a second independent seeded local result using the same algorithm with ±40. Both preserve alpha, inspiration/G1 per-declaration fallback, shadows, source immutability and authoritative locks/Unset. Both local cards appear without waiting for AI. Mysterious is disabled for new requests and retries; existing accepted history remains selectable. Keep the original shared snapshot, two AI lanes, countdown, independent selection, progressive delivery and rail scroll behavior.
+
 The Joker should appear essentially immediately.
 
 The quick AI result should ideally arrive before the four additional styles.

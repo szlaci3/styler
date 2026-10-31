@@ -4,6 +4,7 @@ import { makeGenerationRequest, generateStyle, parseGeneratedOutput, GENERATION_
 import { AGENT, ENDPOINT, extractOutputText, numericUsage, sanitize } from './probe-contract.ts';
 import { parseStyle } from '../shared/style.ts';
 import { presets } from '../src/styles/presets.ts';
+import { ENABLED_EXPRESSIONS } from '../shared/generation.ts';
 
 const [label, mode = 'app', countText = '1', lanesText = '1', gapText = '0', budgetText, context = 'paired', timeoutText = '90000', policy = 'app'] = process.argv.slice(2);
 if (!label || !/^[a-z0-9-]+$/.test(label)) throw new Error('Use a lowercase experiment label.');
@@ -17,12 +18,12 @@ if (!key) throw new Error('Missing server key.');
 const directory = `verification-results/reliability/${label}`;
 await mkdir('verification-results/reliability', { recursive: true });
 await mkdir(directory); // Never overwrite an earlier experiment's evidence.
-const expressions = ['Professional', 'Playful', 'Mysterious', 'Commercial', 'Artistic'] as const;
+const expressions = ENABLED_EXPRESSIONS;
 const reports: object[] = [];
 let cursor = 0, halted = false;
 async function sample(index: number) {
   const inspiration = context === 'varied' ? presets[index % (presets.length + 1)] : index % 2 === 0 ? presets[0] : presets[3];
-  const input = { id: `G${index + 100}`, snapshot: [{ selectorId: 'button', property: 'color', state: 'locked', value: '#abcdef' }, { selectorId: 'card', property: 'padding-top', state: 'unset' }], inspiration, expression: expressions[index % 5] };
+  const input = { id: `G${index + 100}`, snapshot: [{ selectorId: 'button', property: 'color', state: 'locked', value: '#abcdef' }, { selectorId: 'card', property: 'padding-top', state: 'unset' }], inspiration, expression: expressions[index % expressions.length] };
   const body: ReturnType<typeof makeGenerationRequest> = mode === 'baseline'
     ? JSON.parse(await readFile(`verification-results/reliability/baseline/${index}-request.json`, 'utf8'))
     : makeGenerationRequest(input);

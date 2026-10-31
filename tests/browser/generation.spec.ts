@@ -2,9 +2,9 @@ import { test, expect } from '@playwright/test';
 import { seedStyle } from '../../src/styles/presets.ts';
 import { constrainStyle } from '../../shared/constraints.ts';
 import { parseGenerationRequest } from '../../server/generation.ts';
-import { EXPRESSIONS } from '../../shared/generation.ts';
+import { ENABLED_EXPRESSIONS as EXPRESSIONS } from '../../shared/generation.ts';
 
-test('six slots settle progressively with two AI lanes, immutable context, partial failures and one-slot retry', async ({ page }) => {
+test('Joker and Harlequin arrive locally, then four AI slots settle progressively with original-context retry', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const requests: ReturnType<typeof parseGenerationRequest>[] = [];
   const releases = new Map<string, (success: boolean) => void>();
@@ -26,55 +26,56 @@ test('six slots settle progressively with two AI lanes, immutable context, parti
   await generate.click();
   await expect(page.locator('[data-slot]')).toHaveCount(7);
   await expect(page.locator('[data-slot="G2"] .style-card')).toBeVisible();
+  await expect(page.locator('[data-slot="G3"] .style-card')).toBeAttached();
+  await expect(page.locator('[data-slot="G3"] .style-card-id > span')).toHaveText('Harlequin');
   for (const [index, expression] of EXPRESSIONS.entries()) {
-    await expect(page.locator(`[data-slot="G${index + 3}"] .generation-slot strong`)).toHaveText(`G${index + 3} · ${expression}`);
+    await expect(page.locator(`[data-slot="G${index + 4}"] .generation-slot strong`)).toHaveText(`G${index + 4} · ${expression}`);
   }
-  await expect.poll(() => requests.map(r => r.id)).toEqual(['G3', 'G4']);
+  await expect.poll(() => requests.map(r => r.id)).toEqual(['G4', 'G5']);
   const original = requests[0]!;
   await page.getByRole('button', { name: 'Lock button color', exact: true }).click();
-  releases.get('G4')!(true);
-  await expect(page.locator('[data-slot="G4"] .style-card')).toBeAttached();
-  await expect.poll(() => requests.map(r => r.id)).toEqual(['G3', 'G4', 'G5']);
+  releases.get('G5')!(true);
+  await expect(page.locator('[data-slot="G5"] .style-card')).toBeAttached();
+  await expect.poll(() => requests.map(r => r.id)).toEqual(['G4', 'G5', 'G6']);
   // Additional work progresses while the quick slot is still pending.
-  await expect(page.locator('[data-slot="G3"]')).toContainText('Generating…');
+  await expect(page.locator('[data-slot="G4"]')).toContainText('Generating…');
   await expect(page.getByRole('button', { name: 'Generating…', exact: true })).toBeDisabled();
   const rail = page.getByRole('region', { name: 'Scrollable generated styles', exact: true });
   const startScroll = await rail.evaluate(element => element.scrollTop);
-  releases.get('G5')!(false);
-  await expect(page.getByRole('button', { name: 'Retry G5' })).toBeDisabled();
-  await expect.poll(() => requests.at(-1)?.id).toBe('G6');
-  releases.get('G3')!(true);
-  await expect.poll(() => requests.at(-1)?.id).toBe('G7');
-  releases.get('G7')!(true);
-  await expect(page.locator('[data-slot="G7"] .style-card')).toBeAttached();
+  releases.get('G6')!(false);
+  await expect(page.getByRole('button', { name: 'Retry G6' })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Generating…', exact: true })).toBeDisabled();
   expect(await rail.evaluate(element => element.scrollTop)).toBe(startScroll);
-  releases.get('G6')!(true);
+  await expect.poll(() => releases.has('G7')).toBe(true);
+  releases.get('G4')!(true);
+  await expect(page.locator('[data-slot="G4"] .style-card')).toBeAttached();
+  await expect(page.getByRole('button', { name: 'Generating…', exact: true })).toBeDisabled();
+  releases.get('G7')!(true);
   await expect(generate).toBeEnabled();
-  expect(requests).toHaveLength(5);
+  expect(requests).toHaveLength(4);
   expect(peak).toBe(2);
   expect(requests.map(r => r.expression)).toEqual(EXPRESSIONS);
   for (const request of requests) expect(request.snapshot).toEqual(original.snapshot);
   expect(original.snapshot).toContainEqual({ selectorId: 'button', property: 'color', state: 'locked', value: '#fcfbf7' });
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('S1');
-  await expect(page.locator('[data-slot="G5"]')).toContainText('Quota exceeded.');
-  const failed = requests.find(r => r.id === 'G5');
-  await page.getByRole('button', { name: 'Retry G5' }).click();
-  await expect.poll(() => requests.length).toBe(6);
-  expect(requests[5]).toEqual(failed);
-  releases.get('G5')!(true);
-  await expect(page.locator('[data-slot="G5"] .style-card')).toBeAttached();
+  await expect(page.locator('[data-slot="G6"]')).toContainText('Quota exceeded.');
+  const failed = requests.find(r => r.id === 'G6');
+  await page.getByRole('button', { name: 'Retry G6' }).click();
+  await expect.poll(() => requests.length).toBe(5);
+  expect(requests[4]).toEqual(failed);
+  releases.get('G6')!(true);
+  await expect(page.locator('[data-slot="G6"] .style-card')).toBeAttached();
   await expect(generate).toBeEnabled();
   await expect(page.locator('[data-slot]')).toHaveCount(7);
   await expect(page.locator('[data-slot] .style-card')).toHaveCount(7);
   for (const [index, expression] of EXPRESSIONS.entries()) {
-    await expect(page.locator(`[data-slot="G${index + 3}"] .style-card-id > span`)).toHaveText(expression);
+    await expect(page.locator(`[data-slot="G${index + 4}"] .style-card-id > span`)).toHaveText(expression);
   }
-  await page.locator('[data-slot="G3"] .style-card').click();
-  await expect(page.locator('[data-slot="G3"] .style-card-id > span')).toHaveText('Professional');
+  await page.locator('[data-slot="G4"] .style-card').click();
+  await expect(page.locator('[data-slot="G4"] .style-card-id > span')).toHaveText('Professional');
   await expect(page.locator('[data-slot="G2"] .style-card-id > span')).toHaveText('Joker');
   await page.screenshot({ path: 'test-results/expressions-ready.png' });
-  expect(requests).toHaveLength(6); // Five original calls, one manual retry; no dedup/regeneration.
+  expect(requests).toHaveLength(5); // Four originals and one explicit retry.
 });
 
 for (const reducedMotion of ['reduce', 'no-preference'] as const) {
@@ -108,23 +109,23 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
   });
 }
 
-test('same-tick double clicks create one six-slot batch and invalid AI output leaves siblings intact', async ({ page }) => {
+test('same-tick double clicks create one six-slot batch and invalid AI output leaves both local styles intact', async ({ page }) => {
   let calls = 0;
   await page.route('**/api/generate', async route => {
     calls++;
     const body = route.request().postDataJSON();
-    const style = body.id === 'G3' ? { ...seedStyle, id: body.id, provenance: 'antigravity', rules: [
+    const style = body.id === 'G4' ? { ...seedStyle, id: body.id, provenance: 'antigravity', rules: [
       { selectorId: 'page', declarations: [{ id: 'page:color', property: 'color', value: 'url(https://unsafe.example)' }] },
     ] } : { ...seedStyle, id: body.id, provenance: 'antigravity' };
     await route.fulfill({ json: { style } });
   });
   await page.goto('/');
   await page.locator('.generate-button').evaluate((element: HTMLButtonElement) => { element.click(); element.click(); });
-  await expect(page.getByRole('button', { name: 'Retry G3' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Retry G4' })).toBeEnabled();
   await expect(page.locator('[data-slot]')).toHaveCount(7);
-  expect(calls).toBe(5);
+  expect(calls).toBe(4);
   await expect(page.locator('[data-slot] .style-card')).toHaveCount(6);
-  await expect(page.locator('[data-slot="G3"]')).toContainText('Generation failed. Retry manually.');
+  await expect(page.locator('[data-slot="G4"]')).toContainText('Generation failed. Retry manually.');
   await expect(page.getByRole('button', { name: 'Generate', exact: true })).toBeEnabled();
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('S1');
 });

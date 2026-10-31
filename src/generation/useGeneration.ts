@@ -3,10 +3,10 @@ import { parseStyle, type Style } from '../../shared/style.ts';
 import type { Snapshot } from '../../shared/constraints.ts';
 import { ENABLED_EXPRESSIONS, AI_CONCURRENCY, captureGenerationSnapshot, type Expression, type GenerationSnapshot } from '../../shared/generation.ts';
 import { seedStyle } from '../styles/presets.ts';
-import { makeJoker } from './joker.ts';
+import { makeJoker, makeHarlequin } from './joker.ts';
 import { requestStyle } from './requestStyle.ts';
 
-export type Slot = { id: string; context: GenerationSnapshot; seed?: number; expression?: Expression; status: 'pending' | 'ready' | 'error'; style?: Style; error?: string };
+export type Slot = { id: string; context: GenerationSnapshot; seed?: number; localKind?: 'joker' | 'harlequin'; expression?: Expression; status: 'pending' | 'ready' | 'error'; style?: Style; error?: string };
 export function useGeneration() {
   const [slots, setSlots] = useState<Slot[]>([{ id: 'G1', context: captureGenerationSnapshot([]), status: 'ready', style: seedStyle }]);
   const [active, setActive] = useState(false);
@@ -44,17 +44,18 @@ export function useGeneration() {
     const context = captureGenerationSnapshot(constraints, inspiration);
     setLastBatchContext(context);
     guard.current = true; setActive(true);
-    const seed = crypto.getRandomValues(new Uint32Array(1))[0]!;
-    const joker: Slot = { id: `G${next.current++}`, context, seed, status: 'pending' };
+    const seeds = crypto.getRandomValues(new Uint32Array(2));
+    const locals: Slot[] = (['joker', 'harlequin'] as const).map((localKind, index) =>
+      ({ id: `G${next.current++}`, context, seed: seeds[index]!, localKind, status: 'pending' }));
     const ai: Slot[] = ENABLED_EXPRESSIONS.map(expression => ({ id: `G${next.current++}`, context, expression, status: 'pending' }));
-    setSlots(old => [...old, joker, ...ai]);
-    setScrollTarget(joker.id);
+    setSlots(old => [...old, ...locals, ...ai]);
+    setScrollTarget(locals[0]!.id);
     // Yield once so reserved positions can paint, independently of AI.
-    const local = new Promise<void>(resolve => setTimeout(() => {
-      try { update(joker.id, { status: 'ready', style: makeJoker(seed, context.constraints, joker.id, context.inspiration) }); }
-      catch { update(joker.id, { status: 'error', error: 'Local Joker failed.' }); }
+    const local = Promise.all(locals.map(slot => new Promise<void>(resolve => setTimeout(() => {
+      try { update(slot.id, { status: 'ready', style: (slot.localKind === 'harlequin' ? makeHarlequin : makeJoker)(slot.seed!, context.constraints, slot.id, context.inspiration) }); }
+      catch { update(slot.id, { status: 'error', error: `Local ${slot.localKind === 'harlequin' ? 'Harlequin' : 'Joker'} failed.` }); }
       finally { resolve(); }
-    }, 0));
+    }, 0))));
     // Enabled AI work uses the configured lane bound.
     // Each remote call contains its own failure, so a failed card cannot stall siblings.
     void Promise.all([local, runAI(ai)]).finally(release);

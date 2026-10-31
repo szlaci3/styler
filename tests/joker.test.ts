@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { makeJoker } from '../src/generation/joker.ts';
+import { makeJoker, makeHarlequin } from '../src/generation/joker.ts';
 import { presets, seedStyle } from '../src/styles/presets.ts';
 import { parseStyle, type Style } from '../shared/style.ts';
 
@@ -10,7 +10,7 @@ function channels(hex: string) {
   const expanded = hex.length === 4 ? '#' + [...hex.slice(1)].map(c => c + c).join('') : hex;
   return { rgb: [1, 3, 5].map(offset => parseInt(expanded.slice(offset, offset + 2), 16)), alpha: expanded.slice(7).toLowerCase() };
 }
-function assertPalette(style: Style, inspiration: Style | null) {
+function assertPalette(style: Style, inspiration: Style | null, deviation = 20) {
   let checked = 0;
   for (const rule of style.rules) for (const d of rule.declarations) {
     if (!colorRelated(d.property)) continue;
@@ -21,7 +21,7 @@ function assertPalette(style: Style, inspiration: Style | null) {
     if (!hex) { assert.equal(d.value, 'none'); continue; }
     const original = channels(hexIn(source.value)!), actual = channels(hex);
     actual.rgb.forEach((channel, index) => assert.ok(channel >= 0 && channel <= 255
-      && Math.abs(channel - original.rgb[index]!) <= 20, `${d.id} channel ${index}: ${channel} vs ${original.rgb[index]}`));
+      && Math.abs(channel - original.rgb[index]!) <= deviation, `${d.id} channel ${index}: ${channel} vs ${original.rgb[index]}`));
     assert.equal(actual.alpha, original.alpha, d.id);
     checked++;
   }
@@ -36,6 +36,26 @@ test('Joker bounds every color channel to inspiration or G1, including shadow co
   assert.equal(JSON.stringify({ presets, seedStyle }), before);
 });
 
+test('Harlequin is reproducible and bounds every RGB channel to ±40 while reaching beyond Joker’s ±20', () => {
+  const before = JSON.stringify({ presets, seedStyle });
+  let wider = false;
+  for (const inspiration of [null, ...presets]) for (let seed = 0; seed < 100; seed++) {
+    const result = makeHarlequin(seed, [], 'G3', inspiration);
+    assertPalette(result, inspiration, 40);
+    assert.equal(result.provenance, 'harlequin');
+    assert.equal(result.name, `Harlequin ${seed}`);
+    for (const rule of result.rules) for (const d of rule.declarations) {
+      if (!colorRelated(d.property) || !hexIn(d.value)) continue;
+      const source = inspiration?.rules.find(r => r.selectorId === rule.selectorId)?.declarations.find(v => v.property === d.property)
+        ?? seedStyle.rules.find(r => r.selectorId === rule.selectorId)?.declarations.find(v => v.property === d.property);
+      if (source && hexIn(source.value)) wider ||= channels(hexIn(d.value)!).rgb.some((v, i) => Math.abs(v - channels(hexIn(source.value)!).rgb[i]!) > 20);
+    }
+  }
+  assert.ok(wider);
+  assert.deepEqual(makeHarlequin(42, [], 'G3'), makeHarlequin(42, [], 'G3'));
+  assert.equal(JSON.stringify({ presets, seedStyle }), before);
+});
+
 test('Joker supports shorthand/full/alpha hex, channel limits, sparse inspiration and shared palette colors', () => {
   for (const hex of ['#369', '#326496', '#32649680', '#000', '#fff', '#00000000', '#ffffffFF']) {
     const inspiration = parseStyle({ ...seedStyle, rules: [{ selectorId: 'card', declarations: [
@@ -44,9 +64,9 @@ test('Joker supports shorthand/full/alpha hex, channel limits, sparse inspiratio
       { id: 'card:box-shadow', property: 'box-shadow', value: `1px 2px 3px 0px ${hex}` },
     ] }] });
     const before = JSON.stringify(inspiration);
-    for (let seed = 0; seed < 100; seed++) {
-      const result = makeJoker(seed, [], 'G2', inspiration);
-      assertPalette(result, inspiration);
+    for (const [make, deviation] of [[makeJoker, 20], [makeHarlequin, 40]] as const) for (let seed = 0; seed < 100; seed++) {
+      const result = make(seed, [], 'G2', inspiration);
+      assertPalette(result, inspiration, deviation);
       const card = result.rules.find(rule => rule.selectorId === 'card')!;
       const values = card.declarations.filter(d => ['color', 'background-color', 'box-shadow'].includes(d.property)).map(d => hexIn(d.value));
       assert.ok(values.every(value => value === values[0]));
@@ -64,8 +84,8 @@ test('Joker applies exact color/shadow locks and omissions after color variation
     { selectorId: 'card', property: 'background-color', state: 'unset' },
     { selectorId: 'page', property: 'color', state: 'unset' },
   ] as const;
-  for (const inspiration of [null, presets[3]!]) {
-    const result = makeJoker(42, snapshot, 'G2', inspiration);
+  for (const make of [makeJoker, makeHarlequin]) for (const inspiration of [null, presets[3]!]) {
+    const result = make(42, snapshot, 'G2', inspiration);
     for (const c of snapshot) {
       const actual = result.rules.find(rule => rule.selectorId === c.selectorId)?.declarations.find(d => d.property === c.property)?.value;
       assert.equal(actual, c.state === 'locked' ? c.value : undefined);

@@ -19,7 +19,7 @@ test('background polling survives a minute, retains two lanes and captured input
     const jobId = new URL(route.request().url()).searchParams.get('job')!;
     const request = jobs.get(jobId)!;
     if (!ready) await route.fulfill({ status: 202, json: { status: 'pending' } });
-    else if (request.id === 'G3' && requests.filter(r => r.id === 'G3').length === 1) {
+    else if (request.id === 'G4' && requests.filter(r => r.id === 'G4').length === 1) {
       await route.fulfill({ status: 504, json: { error: 'Generation timed out.' } });
     } else await route.fulfill({ json: { style: constrainStyle({ ...seedStyle, id: request.id, provenance: 'antigravity' }, request.snapshot) } });
   });
@@ -47,26 +47,26 @@ test('background polling survives a minute, retains two lanes and captured input
   ready = true;
   for (let wave = 0; wave < 3; wave++) {
     await page.clock.runFor(2010);
-    await expect.poll(() => requests.length).toBe(Math.min(5, 4 + wave));
+    await expect.poll(() => requests.length).toBe(Math.min(4, 4 + wave));
   }
   await expect(generate).toBeEnabled();
-  await expect(page.getByRole('button', { name: 'Retry G3', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Retry G4', exact: true })).toBeEnabled();
   for (const request of requests) {
     expect(request.inspiration?.id).toBe('S4');
     expect(request.snapshot).toEqual(requests[0]!.snapshot);
   }
   await expect(page.getByRole('status', { name: 'Generation constraints', exact: true })).toContainText('have not been used');
   await page.clock.runFor(60_000);
-  expect(requests).toHaveLength(5);
+  expect(requests).toHaveLength(4);
   const finalPolls = polls;
   await page.clock.runFor(10_000);
   expect(polls).toBe(finalPolls);
-  await page.getByRole('button', { name: 'Retry G3', exact: true }).click();
-  await expect.poll(() => requests.length).toBe(6);
+  await page.getByRole('button', { name: 'Retry G4', exact: true }).click();
+  await expect.poll(() => requests.length).toBe(5);
   await page.clock.runFor(2010);
   await expect(generate).toBeEnabled();
-  await expect(page.locator('[data-slot="G3"] .style-card')).toBeAttached();
-  expect(requests[5]).toEqual(requests[0]);
+  await expect(page.locator('[data-slot="G4"] .style-card')).toBeAttached();
+  expect(requests[4]).toEqual(requests[0]);
   await expect(page.locator('[data-slot]')).toHaveCount(7);
 });
 
@@ -78,16 +78,16 @@ test('malformed background acknowledgements and failed status reads do not resub
   });
   await page.goto('/');
   await page.locator('.generate-button').click();
-  await expect(page.getByRole('button', { name: 'Retry G3', exact: true })).toBeEnabled();
-  expect(calls).toBe(5);
-  await expect(page.locator('[data-slot="G3"]')).toContainText('Invalid generated style.');
+  await expect(page.getByRole('button', { name: 'Retry G4', exact: true })).toBeEnabled();
+  expect(calls).toBe(4);
+  await expect(page.locator('[data-slot="G4"]')).toContainText('Invalid generated style.');
   await page.route('**/api/generate', async route => {
     calls++;
     await route.fulfill({ status: 202, json: { jobId: `1761825600000-${'a'.repeat(64)}`, status: 'pending' } });
   });
   await page.route('**/api/generation-status?*', async route => { await route.abort('failed'); });
-  await page.getByRole('button', { name: 'Retry G3', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Retry G3', exact: true })).toBeEnabled();
-  expect(calls).toBe(6);
-  await expect(page.locator('[data-slot="G3"]')).toContainText('Generation failed. Retry manually.');
+  await page.getByRole('button', { name: 'Retry G4', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Retry G4', exact: true })).toBeEnabled();
+  expect(calls).toBe(5);
+  await expect(page.locator('[data-slot="G4"]')).toContainText('Generation failed. Retry manually.');
 });

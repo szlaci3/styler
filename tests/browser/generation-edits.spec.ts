@@ -11,7 +11,7 @@ async function setup(page: Page, outcome: 'success' | 'partial' | 'failure' = 's
     const request = parseGenerationRequest(route.request().postDataJSON());
     requests.push(request);
     if (hold) await new Promise<void>(resolve => { releases.set(request.id, resolve); });
-    if (outcome === 'failure' || (outcome === 'partial' && request.id === 'G3')) {
+    if (outcome === 'failure' || (outcome === 'partial' && request.id === 'G4')) {
       await route.fulfill({ status: 503, json: { error: 'Provider unavailable.' } });
     } else {
       await route.fulfill({ json: { style: constrainStyle({ ...seedStyle, id: request.id, provenance: 'antigravity' }, request.snapshot) } });
@@ -48,28 +48,28 @@ for (const outcome of ['success', 'partial', 'failure'] as const) {
     mock.releaseAll();
     await expect(generate).toBeEnabled();
     await expect(status).toHaveText('Current constraints have not been used. Generate when ready.');
-    expect(mock.requests).toHaveLength(5);
+    expect(mock.requests).toHaveLength(4);
     for (const request of mock.requests) {
       expect(request.snapshot).toEqual([]);
       expect(request.inspiration?.id).toBe('S4');
     }
     await page.clock.runFor(60_000);
-    expect(mock.requests).toHaveLength(5);
+    expect(mock.requests).toHaveLength(4);
     await expect(generate).toHaveAccessibleName('Generate');
     if (outcome === 'partial') await page.screenshot({ path: 'test-results/m17-unused-constraints.png' });
     // Manual generation consumes the live context, even after total failure.
     await generate.click();
     await page.clock.runFor(10);
     await expect(generate).toBeEnabled();
-    expect(mock.requests).toHaveLength(10);
-    for (const request of mock.requests.slice(5)) {
+    expect(mock.requests).toHaveLength(8);
+    for (const request of mock.requests.slice(4)) {
       expect(request.inspiration?.id).toBe('S2');
       expect(request.snapshot).toContainEqual({ selectorId: 'button', property: 'background-color', state: 'locked', value: '#245b63' });
       expect(request.snapshot).toContainEqual({ selectorId: 'card', property: 'padding-top', state: 'unset' });
     }
     await expect(status).not.toContainText('have not been used');
     await page.clock.runFor(60_000);
-    expect(mock.requests).toHaveLength(10);
+    expect(mock.requests).toHaveLength(8);
   });
 }
 
@@ -91,7 +91,7 @@ test('reverting active CSS and inspiration edits clears the notice without sched
   await expect(generate).toBeEnabled();
   await expect(status).not.toContainText('have not been used');
   await page.clock.runFor(60_000);
-  expect(mock.requests).toHaveLength(5);
+  expect(mock.requests).toHaveLength(4);
 });
 
 test('retry preserves unused-input status and old snapshot; a fresh edit starts the next countdown', async ({ page }) => {
@@ -105,23 +105,23 @@ test('retry preserves unused-input status and old snapshot; a fresh edit starts 
   mock.releaseAll();
   await expect(generate).toBeEnabled();
   await expect(status).toContainText('have not been used');
-  await page.getByRole('button', { name: 'Retry G3' }).click();
+  await page.getByRole('button', { name: 'Retry G4' }).click();
   await expect(generate).toBeEnabled();
-  expect(mock.requests[5]).toEqual(mock.requests[0]);
+  expect(mock.requests[4]).toEqual(mock.requests[0]);
   await expect(status).toContainText('have not been used');
   await page.clock.runFor(60_000);
-  expect(mock.requests).toHaveLength(6);
+  expect(mock.requests).toHaveLength(5);
   await page.getByRole('button', { name: 'Unset card padding-top', exact: true }).click();
   await page.clock.runFor(7999);
-  expect(mock.requests).toHaveLength(6);
+  expect(mock.requests).toHaveLength(5);
   await page.clock.runFor(11);
   await expect(generate).toBeEnabled();
-  expect(mock.requests).toHaveLength(11);
+  expect(mock.requests).toHaveLength(9);
   await expect(status).not.toContainText('have not been used');
   // Retrying the older batch after a new full batch cannot change its status.
-  await page.getByRole('button', { name: 'Retry G3' }).click();
+  await page.getByRole('button', { name: 'Retry G4' }).click();
   await expect(generate).toBeEnabled();
-  expect(mock.requests[11]).toEqual(mock.requests[0]);
+  expect(mock.requests[9]).toEqual(mock.requests[0]);
   await expect(status).not.toContainText('have not been used');
   await expect(page.locator('[data-slot]')).toHaveCount(13);
 });
@@ -132,10 +132,11 @@ test('an edit at the final response boundary stays unqueued and uses the origina
   await generate.click();
   await page.clock.runFor(10);
   await expect.poll(() => mock.requests.length).toBe(2);
-  for (const id of ['G3', 'G4', 'G5']) {
-    mock.releases.get(id)!();
-    await expect.poll(() => mock.releases.size).toBe(Number(id.slice(1)));
-  }
+  mock.releases.get('G4')!();
+  await expect.poll(() => mock.releases.has('G6')).toBe(true);
+  mock.releases.get('G5')!();
+  await expect(page.locator('[data-slot="G5"] .style-card')).toBeAttached();
+  await expect.poll(() => mock.releases.has('G7')).toBe(true);
   mock.releases.get('G6')!();
   await expect(page.locator('[data-slot="G6"] .style-card')).toBeAttached();
   // Deliver the edit and final result together while the synchronous guard is busy.
@@ -147,6 +148,6 @@ test('an edit at the final response boundary stays unqueued and uses the origina
   await expect(generate).toBeEnabled();
   await expect(page.getByRole('status', { name: 'Generation constraints', exact: true })).toContainText('have not been used');
   await page.clock.runFor(60_000);
-  expect(mock.requests).toHaveLength(5);
+  expect(mock.requests).toHaveLength(4);
   expect(mock.requests.at(-1)?.snapshot).toEqual([]);
 });

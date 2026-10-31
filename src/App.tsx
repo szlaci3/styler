@@ -52,7 +52,7 @@ function Inspector({ values, constraints, groups, onToggle, active, remaining, u
           ? 'Edits apply to the preview. This batch uses earlier constraints.'
           : remaining !== null && !active ? 'Sending eight seconds after the last constraint change.'
           : unusedConstraints ? 'Current constraints have not been used. Generate when ready.'
-          : 'Joker and five AI expressions. Select as they arrive.'}</p>
+          : 'Joker, Harlequin and four AI expressions. Select as they arrive.'}</p>
       </footer>
     </aside>
   );
@@ -160,9 +160,9 @@ export function App() {
           <div ref={generatedRail} className="rail-scroll scroll-region" tabIndex={0} role="region" aria-label="Scrollable generated styles">
              {generation.slots.map(slot => <div data-slot={slot.id} key={slot.id}>
               {slot.style ? <StyleCard style={slot.style} active={selectedId === slot.id} inspired={slot.id === inspirationId} expression={slot.expression} onSelect={() => setSelectedId(slot.id)} onInspire={() => toggleInspiration(slot.id)} />
-                : <div className="generation-slot" role="status"><strong>{slot.id} · {slot.seed !== undefined ? 'Joker' : slot.expression ?? 'AI'}</strong>
+                : <div className="generation-slot" role="status"><strong>{slot.id} · {slot.localKind === 'harlequin' ? 'Harlequin' : slot.seed !== undefined ? 'Joker' : slot.expression ?? 'AI'}</strong>
                   <p>{slot.status === 'pending' ? 'Generating…' : slot.error}</p>
-                  {slot.status === 'error' && <button disabled={generation.active || (slot.expression !== undefined && !ENABLED_EXPRESSIONS.includes(slot.expression))} onClick={() => retry(slot)} aria-label={`Retry ${slot.id}`}>Retry</button>}
+                  {slot.status === 'error' && slot.seed === undefined && <button disabled={generation.active || (slot.expression !== undefined && !ENABLED_EXPRESSIONS.includes(slot.expression))} onClick={() => retry(slot)} aria-label={`Retry ${slot.id}`}>Retry</button>}
                 </div>}
             </div>)}
             <div className="rail-bottom-note generated-note"><span aria-hidden="true">↟</span><p>New ideas<br />start here.</p></div>

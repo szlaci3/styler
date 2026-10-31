@@ -41,13 +41,13 @@ test('background job is acknowledged before AI work; cross-instance duplicate de
   const f = fixture(async (request, options) => generateStyle(request, { ...options, log: () => {}, fetcher: async (_url, init) => {
     calls++;
     assert.equal(JSON.parse(init!.body as string).agent, AGENT);
-    assert.ok(JSON.parse(init!.body as string).input.includes('Design expression: Artistic.'));
+    assert.ok(JSON.parse(init!.body as string).input.includes('Design expression: Commercial.'));
     await new Promise<void>(resolve => { release = resolve; });
     return Response.json({ agent: AGENT, status: 'completed', steps: [{ type: 'model_output', content: [
       { type: 'text', text: JSON.stringify({ ...seedStyle, id: 'G3', provenance: 'antigravity' }) },
     ] }] });
   } }));
-  const acknowledgement = await f.api.start(post({ ...input, expression: 'Artistic' }));
+  const acknowledgement = await f.api.start(post({ ...input, expression: 'Commercial' }));
   assert.equal(acknowledgement.status, 202);
   const job = await acknowledgement.json();
   assert.equal(calls, 0); assert.equal(f.dispatched.length, 1);

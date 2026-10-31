@@ -45,7 +45,7 @@ for (const width of [1280, 1440, 1920]) {
   });
 }
 
-test('Joker, AI and retry share original inspiration despite edits; generated styles can inspire later batches', async ({ page }) => {
+test('Joker, Harlequin, AI and retry retain captured inputs; each local style can inspire later batches', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const requests: ReturnType<typeof parseGenerationRequest>[] = [];
   let release!: () => void;
@@ -64,7 +64,7 @@ test('Joker, AI and retry share original inspiration despite edits; generated st
   const generate = page.getByRole('button', { name: 'Generate', exact: true });
   await generate.click();
   await expect(page.locator('[data-slot="G2"] .style-card')).toBeVisible();
-  await expect.poll(() => requests.length).toBe(5);
+  await expect.poll(() => requests.length).toBe(4);
   const original = requests[0]!;
   expect(original.inspiration?.id).toBe('S4');
   expect(original.inspiration?.rules.find(rule => rule.selectorId === 'button')?.declarations.find(d => d.property === 'background-color')?.value).toBe('#ffb545');
@@ -76,29 +76,41 @@ test('Joker, AI and retry share original inspiration despite edits; generated st
   await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('background-color', 'rgb(36, 91, 99)');
   const localCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
   expect(localCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
+  await page.locator('[data-slot="G3"] .style-card').click();
+  await expect(page.locator('[data-slot="G3"] .style-card-id > span')).toHaveText('Harlequin');
+  await expect(page.locator('.sample-page')).toHaveCSS('font-family', '"Courier New", monospace');
+  await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('background-color', 'rgb(36, 91, 99)');
+  const harlequinCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
+  expect(harlequinCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
+  await page.locator('[data-slot="G2"] .style-card').click();
   release();
-  const retry = page.getByRole('button', { name: 'Retry G3' });
+  const retry = page.getByRole('button', { name: 'Retry G4' });
   await expect(retry).toBeEnabled();
   await retry.click();
-  await expect(page.locator('[data-slot="G3"] .style-card')).toBeVisible();
-  expect(requests.filter(r => r.id === 'G3')[1]).toEqual(original);
+  await expect(page.locator('[data-slot="G4"] .style-card')).toBeVisible();
+  expect(requests.filter(r => r.id === 'G4')[1]).toEqual(original);
   await expect(page.locator('[data-slot]')).toHaveCount(7);
   await expect(page.getByRole('button', { name: 'Use S2 as inspiration', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G2');
-  await page.locator('[data-slot="G3"] .style-card').click();
+  await page.locator('[data-slot="G4"] .style-card').click();
   await expect(page.getByRole('button', { name: 'Find your space' })).toHaveCSS('background-color', 'rgb(36, 91, 99)');
   const aiCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
   expect(aiCss).not.toMatch(/\.sample-card\s*\{[^}]*padding-top:/);
-  await page.getByRole('button', { name: 'Use G3 as inspiration', exact: true }).click();
+  await page.getByRole('button', { name: 'Use G4 as inspiration', exact: true }).click();
   await expect(page.locator('.inspiration-button[aria-pressed=true]')).toHaveCount(1);
   await generate.click();
   await expect(page.locator('[data-slot="G13"] .style-card')).toBeAttached();
-  expect(requests.find(r => r.id === 'G9')?.inspiration?.id).toBe('G3');
-  await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G3');
+  expect(requests.find(r => r.id === 'G10')?.inspiration?.id).toBe('G4');
+  await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G4');
   await page.getByRole('button', { name: 'Clear inspiration', exact: true }).click();
   await generate.click();
   await expect(page.locator('[data-slot="G19"] .style-card')).toBeAttached();
-  expect(requests.find(r => r.id === 'G15')?.inspiration).toBe(null);
+  expect(requests.find(r => r.id === 'G16')?.inspiration).toBe(null);
   await page.getByRole('button', { name: 'Use G2 as inspiration', exact: true }).click();
   await expect(page.getByRole('status', { name: 'Generation inspiration' })).toHaveText('Inspiration: G2Clear inspiration');
+  await page.getByRole('button', { name: 'Use G3 as inspiration', exact: true }).click();
+  await generate.click();
+  await expect(page.locator('[data-slot="G25"] .style-card')).toBeAttached();
+  expect(requests.find(r => r.id === 'G22')?.inspiration?.id).toBe('G3');
+  expect(requests.find(r => r.id === 'G22')?.inspiration?.provenance).toBe('harlequin');
 });

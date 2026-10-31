@@ -49,11 +49,11 @@ test('eight-second boundary, final 3/2/1 labels and one automatic six-slot batch
   await page.clock.runFor(10);
   await expect(page.locator('[data-slot="G7"] .style-card')).toBeAttached();
   await expect(generate).toHaveAccessibleName('Generate');
-  expect(requests).toHaveLength(5);
+  expect(requests).toHaveLength(4);
   await expect(page.locator('[data-slot]')).toHaveCount(7);
   for (const request of requests) expect(request.snapshot).toEqual([{ selectorId: 'button', property: 'color', state: 'locked', value: '#fcfbf7' }]);
   await page.clock.runFor(60_000);
-  expect(requests).toHaveLength(5);
+  expect(requests).toHaveLength(4);
   await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('S1');
 });
 
@@ -86,7 +86,7 @@ test('CSS states and cross-rail inspiration changes/clears reset one shared dead
   await advance(7999, 'Sending in 1…');
   await page.clock.runFor(11);
   await expect(page.locator('[data-slot="G7"] .style-card')).toBeAttached();
-  expect(requests).toHaveLength(5);
+  expect(requests).toHaveLength(4);
   for (const request of requests) { expect(request.snapshot).toEqual([]); expect(request.inspiration).toBeNull(); }
 });
 
@@ -112,7 +112,7 @@ test('preview selection, hover, scrolling and sample controls do not arm or post
   await expect(page.locator('.generate-button')).toHaveAccessibleName('Sending in 3…');
   await page.clock.runFor(3010);
   await expect(page.locator('[data-slot="G7"] .style-card')).toBeAttached();
-  expect(calls).toBe(5);
+  expect(calls).toBe(4);
   await expect(page.getByRole('textbox', { name: 'Email address' })).toHaveValue('countdown@example.com');
 });
 
@@ -126,16 +126,16 @@ test('manual Generate and manual Retry cancel pending countdowns without duplica
   await expect(generate).toHaveAccessibleName('Sending in 1…');
   await generate.focus(); await page.keyboard.press('Enter');
   await page.clock.runFor(10);
-  await expect(page.getByRole('button', { name: 'Retry G3' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Retry G4' })).toBeEnabled();
   await page.clock.runFor(60_000);
-  expect(calls).toBe(5);
+  expect(calls).toBe(4);
   await page.getByRole('button', { name: 'Unset card padding-top', exact: true }).click();
   await page.clock.runFor(6000);
   await expect(generate).toHaveAccessibleName('Sending in 2…');
-  await page.getByRole('button', { name: 'Retry G3' }).click();
-  await expect(page.getByRole('button', { name: 'Retry G3' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Retry G4' }).click();
+  await expect(page.getByRole('button', { name: 'Retry G4' })).toBeEnabled();
   await page.clock.runFor(60_000);
-  expect(calls).toBe(6);
+  expect(calls).toBe(5);
   await expect(page.locator('[data-slot]')).toHaveCount(7);
   await expect(generate).toHaveAccessibleName('Generate');
 });
@@ -163,10 +163,10 @@ test('active-batch edits never arm or queue a timer; a later fresh edit can star
   await expect(page.locator('[data-slot="G7"] .style-card')).toBeAttached();
   await expect(page.locator('.generate-button')).toHaveAccessibleName('Generate');
   await page.clock.runFor(60_000);
-  expect(requests).toHaveLength(5);
+  expect(requests).toHaveLength(4);
   for (const request of requests) { expect(request.snapshot).toEqual([]); expect(request.inspiration?.id).toBe('S4'); }
   await page.getByRole('button', { name: 'Lock button color', exact: true }).click();
   await page.clock.runFor(8010);
   await expect(page.locator('[data-slot="G13"] .style-card')).toBeAttached();
-  expect(requests).toHaveLength(10);
+  expect(requests).toHaveLength(8);
 });

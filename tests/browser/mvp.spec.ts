@@ -53,9 +53,9 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     await generate.focus(); await page.keyboard.press('Enter');
     await expect(page.locator('[data-slot]')).toHaveCount(7);
     await expect(page.locator('[data-slot="G2"] .style-card')).toBeVisible();
-    await expect(page.locator('[data-slot="G3"]')).toContainText('Generating…');
+    await expect(page.locator('[data-slot="G4"]')).toContainText('Generating…');
     await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('S3');
-    await expect.poll(() => requests.length).toBe(5);
+    await expect.poll(() => requests.length).toBe(4);
     const captured = requests[0]!;
     expect(captured.snapshot).toEqual([
       { selectorId: 'button', property: 'background-color', state: 'locked', value: '#245b63' },
@@ -71,15 +71,15 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
     await backgroundLock.click();
     await expect(backgroundLock).toHaveAttribute('aria-pressed', 'false');
     release();
-    const retry = page.getByRole('button', { name: 'Retry G3' });
+    const retry = page.getByRole('button', { name: 'Retry G4' });
     await expect(retry).toBeEnabled();
-    await expect(page.locator('[data-slot="G3"]')).toContainText('Quota exceeded.');
+    await expect(page.locator('[data-slot="G4"]')).toContainText('Quota exceeded.');
     await retry.focus(); await page.keyboard.press('Enter');
-    await expect(page.locator('[data-slot="G3"] .style-card')).toBeVisible();
-    expect(requests.filter(r => r.id === 'G3')[1]).toEqual(captured);
+    await expect(page.locator('[data-slot="G4"] .style-card')).toBeVisible();
+    expect(requests.filter(r => r.id === 'G4')[1]).toEqual(captured);
     await expect(page.locator('[data-slot]')).toHaveCount(7);
     await expect(page.getByRole('status', { name: 'Selected style' })).toContainText('G2');
-    const ai = page.locator('[data-slot="G3"] .style-card');
+    const ai = page.locator('[data-slot="G4"] .style-card');
     await ai.focus(); await page.keyboard.press('Space');
     await expect(previewButton).toHaveCSS('background-color', 'rgb(36, 91, 99)');
     const aiCss = await page.locator('.preview-host').evaluate(host => host.shadowRoot!.querySelector('[data-preview-selected]')!.textContent!);
@@ -147,15 +147,15 @@ test('page load and preview interactions never generate; manual send cancels cou
   const generate = page.getByRole('button', { name: 'Generate', exact: true });
   await generate.focus(); await page.keyboard.press('Enter');
   await page.clock.runFor(10);
-  await expect(page.getByRole('button', { name: 'Retry G3' })).toBeEnabled();
-  await expect(page.locator('[data-slot="G3"]')).toContainText('Generation timed out.');
+  await expect(page.getByRole('button', { name: 'Retry G4' })).toBeEnabled();
+  await expect(page.locator('[data-slot="G4"]')).toContainText('Generation timed out.');
   await page.getByRole('button', { name: 'S1: Tidal Atelier', exact: true }).click();
   await page.clock.fastForward(60_000);
-  expect(calls).toBe(5);
+  expect(calls).toBe(4);
   await expect(page.locator('[data-slot]')).toHaveCount(7);
   await page.reload();
   await page.clock.fastForward(60_000);
   await expect(page.locator('[data-slot]')).toHaveCount(1);
   await expect(lock).toHaveAttribute('aria-pressed', 'false');
-  expect(calls).toBe(5);
+  expect(calls).toBe(4);
 });

@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { chromium, type Request } from '@playwright/test';
 import { parseStyle } from '../shared/style.ts';
-import { AI_CONCURRENCY, AI_RESULTS_PER_BATCH } from '../shared/generation.ts';
+import { AI_CONCURRENCY, AI_RESULTS_PER_BATCH, RESULTS_PER_BATCH } from '../shared/generation.ts';
 import { parseGenerationRequest } from './generation.ts';
 import { AGENT, isRecord, numericUsage } from './probe-contract.ts';
 
@@ -83,6 +83,8 @@ try {
   await page.getByRole('button', { name: 'Generate', exact: true }).click();
   await page.locator('[data-slot="G2"] .style-card').waitFor({ state: 'attached' });
   evidence.jokerReadyMs = Math.round(performance.now() - started);
+  await page.locator('[data-slot="G3"] .style-card').waitFor({ state: 'attached' });
+  evidence.harlequinReadyMs = Math.round(performance.now() - started);
   if (inspirationMode) await page.getByRole('button', { name: 'Use S2 as inspiration', exact: true }).click();
   await Promise.race([allResponses, new Promise<never>((_, reject) => { deadline = setTimeout(() => reject(new Error('Live batch verification timed out.')), 310_000); })]);
   clearTimeout(deadline);
@@ -103,7 +105,7 @@ try {
   if (firstValid) await page.locator(`[data-slot="${firstValid.slot}"] .style-card`).click();
   await mkdir('verification-results', { recursive: true });
   await page.screenshot({ path: 'verification-results/m15-live-batch.png' });
-  if (requests.size !== AI_RESULTS_PER_BATCH || generatedSlots !== AI_RESULTS_PER_BATCH + 2 || readyCards !== AI_RESULTS_PER_BATCH + 2 || peak > AI_CONCURRENCY || !evidence.sharedSnapshotValid
+  if (requests.size !== AI_RESULTS_PER_BATCH || generatedSlots !== RESULTS_PER_BATCH + 1 || readyCards !== RESULTS_PER_BATCH + 1 || peak > AI_CONCURRENCY || !evidence.sharedSnapshotValid
     || samples.some(sample => !sample.valid || !sample.inspirationSnapshotValid)) throw new Error('Live batch had failed slots or violated acceptance checks; evidence retained.');
 } catch (error) {
   evidence.error = error instanceof Error ? error.message : 'Live batch verification failed.';

@@ -3,6 +3,14 @@ import { constrainStyle, parseSnapshot, type Snapshot } from '../../shared/const
 import { presets, seedStyle } from '../styles/presets.ts';
 
 export function makeJoker(seed: number, snapshot: Snapshot, id: string, inspiration: Style | null = null) {
+  return makeLocalStyle(seed, snapshot, id, inspiration, 'joker', 20);
+}
+
+export function makeHarlequin(seed: number, snapshot: Snapshot, id: string, inspiration: Style | null = null) {
+  return makeLocalStyle(seed, snapshot, id, inspiration, 'harlequin', 40);
+}
+
+function makeLocalStyle(seed: number, snapshot: Snapshot, id: string, inspiration: Style | null, kind: 'joker' | 'harlequin', deviation: number) {
   const captured = parseSnapshot(snapshot);
   let state = seed >>> 0;
   const random = () => { state = (Math.imul(1664525, state) + 1013904223) >>> 0; return state / 4294967296; };
@@ -11,7 +19,7 @@ export function makeJoker(seed: number, snapshot: Snapshot, id: string, inspirat
     const expanded = hex.length === 4 ? '#' + [...hex.slice(1)].map(c => c + c).join('') : hex;
     return '#' + [1, 3, 5].map(offset => {
       const original = parseInt(expanded.slice(offset, offset + 2), 16);
-      const min = Math.max(0, original - 20), max = Math.min(255, original + 20);
+      const min = Math.max(0, original - deviation), max = Math.min(255, original + deviation);
       return (min + Math.floor(random() * (max - min + 1))).toString(16).padStart(2, '0');
     }).join('') + expanded.slice(7);
   };
@@ -60,5 +68,5 @@ export function makeJoker(seed: number, snapshot: Snapshot, id: string, inspirat
     }
     return { ...d, value };
   }) }));
-  return constrainStyle(parseStyle({ ...base, id, name: `Joker ${seed >>> 0}`, provenance: 'joker', rules }), captured);
+  return constrainStyle(parseStyle({ ...base, id, name: `${kind === 'joker' ? 'Joker' : 'Harlequin'} ${seed >>> 0}`, provenance: kind, rules }), captured);
 }

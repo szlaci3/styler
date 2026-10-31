@@ -25,7 +25,7 @@ export function StyleCard({ style, active, inspired, onSelect, onInspire, expres
           <span className="style-sample-lines"><i style={{ backgroundColor: page.color }} /><i /></span>
           <span className="style-sample-button" style={buttonAppearance}>{style.id}</span>
         </span>
-        <span className="style-card-id">{style.id}<span>{style.provenance === 'seed' ? 'Seed' : style.provenance === 'joker' ? 'Joker' : style.provenance === 'antigravity' ? expression ?? 'AI' : active ? 'Active' : 'Preset'}</span></span>
+        <span className="style-card-id">{style.id}<span>{style.provenance === 'seed' ? 'Seed' : style.provenance === 'joker' ? 'Joker' : style.provenance === 'harlequin' ? 'Harlequin' : style.provenance === 'antigravity' ? expression ?? 'AI' : active ? 'Active' : 'Preset'}</span></span>
       </button>
       <button type="button" className="inspiration-button" aria-label={`Use ${style.id} as inspiration`} aria-pressed={inspired}
         title={inspired ? `Clear ${style.id} inspiration` : `Use ${style.name} for future generation`} onClick={onInspire}>
