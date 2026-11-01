@@ -1,30 +1,125 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500" fill="none">
-  <defs><linearGradient id="wall" x2="800" y2="500" gradientUnits="userSpaceOnUse"><stop stop-color="#e4e7da"/><stop offset="1" stop-color="#babfad"/></linearGradient></defs>
-  <path fill="url(#wall)" d="M0 0h800v500H0z"/>
-  <path fill="#a8a68e" d="M0 390h800v110H0z"/>
-  <path fill="#ece8d7" d="M456 0h232v317H456z"/>
-  <path fill="#b8ced0" d="M469 0h206v303H469z"/>
-  <path fill="#899b77" d="M469 223q56-87 111-21t95-18v119H469z"/>
-  <path fill="#f7eccb" d="M469 75h206v10H469zM568 0h9v303h-9z"/>
-  <path fill="#e3ddc5" d="m469 317 206 0 125 127v56H629z"/>
-  <path fill="#656e59" d="M86 99h235v195H86z"/>
-  <path fill="#e3dfc9" d="M96 109h215v175H96z"/>
-  <path fill="#9ca98a" d="M129 245V151h48v94zm59 0v-61h47v61z"/>
-  <circle cx="263" cy="151" r="22" fill="#c3a87a"/>
-  <path fill="#938064" d="M70 310h268v12H70zM90 322h11v68H90zm215 0h11v68h-11z"/>
-  <path fill="#697f67" d="M248 350a42 42 0 0 1 84 0v93h-84zm239 0a42 42 0 0 1 84 0v93h-84z"/>
-  <path fill="#a89473" d="m269 365 13 135h17l-9-135zm264 0-8 135h17l12-135z"/>
-  <ellipse cx="410" cy="340" rx="187" ry="52" fill="#c1ab88"/>
-  <ellipse cx="410" cy="332" rx="187" ry="51" fill="#d6c2a0"/>
-  <path fill="#496452" d="M322 417a44 44 0 0 1 88 0v83h-88zm136 0a44 44 0 0 1 88 0v83h-88z"/>
-  <path fill="#f4ecdb" d="M363 311h48v16h-48zM477 305h21v24h-21zM296 318h21v23h-21z"/>
-  <path fill="#7e8b6d" d="M423 297h24l-4 34h-16z"/>
-  <path stroke="#627859" stroke-width="3" d="M435 301v-40m0 24-15-13m15 1 14-13"/>
-  <g fill="#98a280"><ellipse cx="420" cy="267" rx="6" ry="12" transform="rotate(-45 420 267)"/><ellipse cx="449" cy="257" rx="6" ry="12" transform="rotate(40 449 257)"/></g>
-  <path stroke="#85816a" stroke-width="4" d="M400 0v108"/>
-  <path fill="#ddd1ae" d="M337 135a63 40 0 0 1 126 0z"/>
-  <ellipse cx="400" cy="135" rx="63" ry="10" fill="#f5e9c9"/>
-  <path fill="#eee9db" d="M714 341h49v49h-49z"/>
-  <path stroke="#718366" stroke-width="5" d="M738 345V247"/>
-  <g fill="#819373"><ellipse cx="722" cy="278" rx="12" ry="27" transform="rotate(-40 722 278)"/><ellipse cx="752" cy="252" rx="12" ry="27" transform="rotate(35 752 252)"/></g>
+  <defs>
+    <linearGradient id="wall" x2="800" y2="500" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity=".55" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".2" />
+    </linearGradient>
+    <mask id="tint-1" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M456 0h232v317H456z" />
+    </mask>
+    <mask id="tint-2" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M469 0h206v303H469z" />
+    </mask>
+    <mask id="tint-3" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M469 223q56-87 111-21t95-18v119H469z" />
+    </mask>
+    <mask id="tint-4" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M86 99h235v195H86z" />
+    </mask>
+    <mask id="tint-5" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M96 109h215v175H96z" />
+    </mask>
+    <mask id="tint-6" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M129 245V151h48v94zm59 0v-61h47v61z" />
+    </mask>
+    <mask id="tint-7" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M248 350a42 42 0 0 1 84 0v93h-84zm239 0a42 42 0 0 1 84 0v93h-84z" />
+    </mask>
+    <mask id="tint-8" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M322 417a44 44 0 0 1 88 0v83h-88zm136 0a44 44 0 0 1 88 0v83h-88z" />
+    </mask>
+    <mask id="tint-9" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M423 297h24l-4 34h-16z" />
+    </mask>
+    <mask id="tint-10" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path stroke="black" stroke-width="3" d="M435 301v-40m0 24-15-13m15 1 14-13" />
+    </mask>
+    <mask id="tint-11" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <g fill="black">
+        <ellipse cx="420" cy="267" rx="6" ry="12" transform="rotate(-45 420 267)" />
+        <ellipse cx="449" cy="257" rx="6" ry="12" transform="rotate(40 449 257)" />
+      </g>
+    </mask>
+    <mask id="tint-12" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path stroke="black" stroke-width="5" d="M738 345V247" />
+    </mask>
+    <mask id="tint-13" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <g fill="black">
+        <ellipse cx="722" cy="278" rx="12" ry="27" transform="rotate(-40 722 278)" />
+        <ellipse cx="752" cy="252" rx="12" ry="27" transform="rotate(35 752 252)" />
+      </g>
+    </mask>
+  </defs>
+  <g mask="url(#tint-13)">
+    <g mask="url(#tint-12)">
+      <g mask="url(#tint-11)">
+        <g mask="url(#tint-10)">
+          <g mask="url(#tint-9)">
+            <g mask="url(#tint-8)">
+              <g mask="url(#tint-7)">
+                <g mask="url(#tint-6)">
+                  <g mask="url(#tint-5)">
+                    <g mask="url(#tint-4)">
+                      <g mask="url(#tint-3)">
+                        <g mask="url(#tint-2)">
+                          <g mask="url(#tint-1)">
+                            <path fill="url(#wall)" d="M0 0h800v500H0z" />
+                            <path fill="#a8a68e" d="M0 390h800v110H0z" />
+                          </g>
+                          <path fill="#ffffff" fill-opacity=".2" d="M456 0h232v317H456z" />
+                        </g>
+                        <path fill="#ffffff" fill-opacity=".25" d="M469 0h206v303H469z" />
+                      </g>
+                      <path fill="#000000" fill-opacity=".12" d="M469 223q56-87 111-21t95-18v119H469z" />
+                      <path fill="#f7eccb" d="M469 75h206v10H469zM568 0h9v303h-9z" />
+                      <path fill="#e3ddc5" d="m469 317 206 0 125 127v56H629z" />
+                    </g>
+                    <path fill="#000000" fill-opacity=".3" d="M86 99h235v195H86z" />
+                  </g>
+                  <path fill="#ffffff" fill-opacity=".6" d="M96 109h215v175H96z" />
+                </g>
+                <path fill="#ffffff" fill-opacity=".2" d="M129 245V151h48v94zm59 0v-61h47v61z" />
+                <circle cx="263" cy="151" r="22" fill="#c3a87a" />
+                <path fill="#938064" d="M70 310h268v12H70zM90 322h11v68H90zm215 0h11v68h-11z" />
+              </g>
+              <path fill="#000000" fill-opacity=".18" d="M248 350a42 42 0 0 1 84 0v93h-84zm239 0a42 42 0 0 1 84 0v93h-84z" />
+              <path fill="#a89473" d="m269 365 13 135h17l-9-135zm264 0-8 135h17l12-135z" />
+              <ellipse cx="410" cy="340" rx="187" ry="52" fill="#c1ab88" />
+              <ellipse cx="410" cy="332" rx="187" ry="51" fill="#d6c2a0" />
+            </g>
+            <path fill="#000000" fill-opacity=".35" d="M322 417a44 44 0 0 1 88 0v83h-88zm136 0a44 44 0 0 1 88 0v83h-88z" />
+            <path fill="#f4ecdb" d="M363 311h48v16h-48zM477 305h21v24h-21zM296 318h21v23h-21z" />
+          </g>
+          <path fill="#000000" fill-opacity=".2" d="M423 297h24l-4 34h-16z" />
+        </g>
+        <path stroke="#000000" stroke-opacity=".35" stroke-width="3" d="M435 301v-40m0 24-15-13m15 1 14-13" />
+      </g>
+      <g fill="#ffffff" fill-opacity=".1">
+        <ellipse cx="420" cy="267" rx="6" ry="12" transform="rotate(-45 420 267)" />
+        <ellipse cx="449" cy="257" rx="6" ry="12" transform="rotate(40 449 257)" />
+      </g>
+      <path stroke="#85816a" stroke-width="4" d="M400 0v108" />
+      <path fill="#ddd1ae" d="M337 135a63 40 0 0 1 126 0z" />
+      <ellipse cx="400" cy="135" rx="63" ry="10" fill="#f5e9c9" />
+      <path fill="#eee9db" d="M714 341h49v49h-49z" />
+    </g>
+    <path stroke="#000000" stroke-opacity=".3" stroke-width="5" d="M738 345V247" />
+  </g>
+  <g fill="#000000" fill-opacity=".12">
+    <ellipse cx="722" cy="278" rx="12" ry="27" transform="rotate(-40 722 278)" />
+    <ellipse cx="752" cy="252" rx="12" ry="27" transform="rotate(35 752 252)" />
+  </g>
 </svg>

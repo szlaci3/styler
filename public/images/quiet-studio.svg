@@ -1,32 +1,114 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500" fill="none">
   <defs>
-    <linearGradient id="wall" x2="800" y2="500" gradientUnits="userSpaceOnUse"><stop stop-color="#eae4d6"/><stop offset="1" stop-color="#c9cbb8"/></linearGradient>
-    <linearGradient id="glass" y2="400" gradientUnits="userSpaceOnUse"><stop stop-color="#b7cbd0"/><stop offset="1" stop-color="#f5eac7"/></linearGradient>
+    <linearGradient id="wall" x2="800" y2="500" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity=".55" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".2" />
+    </linearGradient>
+    <linearGradient id="glass" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity=".35" />
+      <stop offset="1" stop-color="#ffe9a0" stop-opacity=".12" />
+    </linearGradient>
+    <mask id="tint-1" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M0 430h800v70H0z" />
+    </mask>
+    <mask id="tint-2" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M92 330V150a115 115 0 0 1 230 0v180z" />
+    </mask>
+    <mask id="tint-3" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M107 255q65-85 132-15t68-18v108H107z" />
+    </mask>
+    <mask id="tint-4" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M365 397a36 36 0 0 1 72 0v49h-72z" />
+    </mask>
+    <mask id="tint-5" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M353 439h96v13h-96zM370 451h9v49h-9zm56 0h9v49h-9z" />
+    </mask>
+    <mask id="tint-6" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M488 270h7v76h-7z" />
+    </mask>
+    <mask id="tint-7" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M456 277a37 37 0 0 1 74 0z" />
+    </mask>
+    <mask id="tint-8" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path stroke="black" stroke-width="7" d="M681 367V204m0 95-30-30m30-11 30-34m-30 109 39-20" />
+    </mask>
+    <mask id="tint-9" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <g fill="black">
+        <ellipse cx="649" cy="263" rx="14" ry="30" transform="rotate(-35 649 263)" />
+        <ellipse cx="713" cy="220" rx="16" ry="30" transform="rotate(35 713 220)" />
+        <ellipse cx="721" cy="307" rx="15" ry="29" transform="rotate(50 721 307)" />
+        <ellipse cx="680" cy="202" rx="15" ry="31" />
+      </g>
+    </mask>
+    <mask id="tint-10" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M461 65h112v101H461z" />
+    </mask>
+    <mask id="tint-11" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="500">
+      <path fill="white" d="M0 0h800v500H0z" />
+      <path fill="black" d="M484 143a31 31 0 0 1 62 0z" />
+    </mask>
   </defs>
-  <path fill="url(#wall)" d="M0 0h800v500H0z"/>
-  <path fill="#b2ab93" d="M0 379h800v121H0z"/>
-  <path fill="#8d9783" d="M0 430h800v70H0z"/>
-  <path fill="#f0e9da" d="M92 330V150a115 115 0 0 1 230 0v180z"/>
-  <path fill="url(#glass)" d="M107 330V150a100 100 0 0 1 200 0v180z"/>
-  <circle cx="259" cy="128" r="30" fill="#f8e7ae"/>
-  <path fill="#9caa89" d="M107 255q65-85 132-15t68-18v108H107z"/>
-  <path fill="#e9e4d2" d="M199 52h10v278h-10zM107 196h200v9H107z"/>
-  <path fill="#f8efd5" fill-opacity=".4" d="m107 330 200 0 282 170H336z"/>
-  <path fill="#807256" d="M97 316h230v18H97zM196 364h401v17H196z"/>
-  <path fill="#8d7959" d="m219 381-16 119h13l25-119zm343 0 18 119h14l-11-119z"/>
-  <path fill="#b79c71" d="M183 346h427v18H183z"/>
-  <path fill="#4e6553" d="M365 397a36 36 0 0 1 72 0v49h-72z"/>
-  <path fill="#354f42" d="M353 439h96v13h-96zM370 451h9v49h-9zm56 0h9v49h-9z"/>
-  <path fill="#5b6252" d="M488 270h7v76h-7z"/>
-  <path fill="#677361" d="M456 277a37 37 0 0 1 74 0z"/>
-  <path fill="#efe6ce" d="M473 340h39v6h-39zM255 326h55v19h-55z"/>
-  <path fill="#947653" d="M255 332h55v4h-55z"/>
-  <path stroke="#5c7359" stroke-width="7" d="M681 367V204m0 95-30-30m30-11 30-34m-30 109 39-20"/>
-  <g fill="#7b8c68"><ellipse cx="649" cy="263" rx="14" ry="30" transform="rotate(-35 649 263)"/><ellipse cx="713" cy="220" rx="16" ry="30" transform="rotate(35 713 220)"/><ellipse cx="721" cy="307" rx="15" ry="29" transform="rotate(50 721 307)"/><ellipse cx="680" cy="202" rx="15" ry="31"/></g>
-  <path fill="#ba9d78" d="M646 361h72l-11 75h-50z"/>
-  <path fill="#d4b68c" d="M641 355h82v13h-82z"/>
-  <path fill="#ded8c9" d="M461 65h112v101H461z"/>
-  <path stroke="#948e78" stroke-width="5" d="M471 75h92v81h-92z"/>
-  <path fill="#b1b99f" d="M484 143a31 31 0 0 1 62 0z"/>
-  <circle cx="534" cy="98" r="10" fill="#c1a46f"/>
+  <g mask="url(#tint-11)">
+    <g mask="url(#tint-10)">
+      <g mask="url(#tint-9)">
+        <g mask="url(#tint-8)">
+          <g mask="url(#tint-7)">
+            <g mask="url(#tint-6)">
+              <g mask="url(#tint-5)">
+                <g mask="url(#tint-4)">
+                  <g mask="url(#tint-3)">
+                    <g mask="url(#tint-2)">
+                      <g mask="url(#tint-1)">
+                        <path fill="url(#wall)" d="M0 0h800v500H0z" />
+                        <path fill="#b2ab93" d="M0 379h800v121H0z" />
+                      </g>
+                      <path fill="#000000" fill-opacity=".12" d="M0 430h800v70H0z" />
+                    </g>
+                    <path fill="#ffffff" fill-opacity=".2" d="M92 330V150a115 115 0 0 1 230 0v180z" />
+                    <path fill="url(#glass)" d="M107 330V150a100 100 0 0 1 200 0v180z" />
+                    <circle cx="259" cy="128" r="30" fill="#f8e7ae" />
+                  </g>
+                  <path fill="#ffffff" fill-opacity=".22" d="M107 255q65-85 132-15t68-18v108H107z" />
+                  <path fill="#e9e4d2" d="M199 52h10v278h-10zM107 196h200v9H107z" />
+                  <path fill="#f8efd5" fill-opacity=".4" d="m107 330 200 0 282 170H336z" />
+                  <path fill="#807256" d="M97 316h230v18H97zM196 364h401v17H196z" />
+                  <path fill="#8d7959" d="m219 381-16 119h13l25-119zm343 0 18 119h14l-11-119z" />
+                  <path fill="#b79c71" d="M183 346h427v18H183z" />
+                </g>
+                <path fill="#000000" fill-opacity=".25" d="M365 397a36 36 0 0 1 72 0v49h-72z" />
+              </g>
+              <path fill="#000000" fill-opacity=".45" d="M353 439h96v13h-96zM370 451h9v49h-9zm56 0h9v49h-9z" />
+            </g>
+            <path fill="#000000" fill-opacity=".4" d="M488 270h7v76h-7z" />
+          </g>
+          <path fill="#000000" fill-opacity=".28" d="M456 277a37 37 0 0 1 74 0z" />
+          <path fill="#efe6ce" d="M473 340h39v6h-39zM255 326h55v19h-55z" />
+          <path fill="#947653" d="M255 332h55v4h-55z" />
+        </g>
+        <path stroke="#000000" stroke-opacity=".3" stroke-width="7" d="M681 367V204m0 95-30-30m30-11 30-34m-30 109 39-20" />
+      </g>
+      <g fill="#ffffff" fill-opacity=".12">
+        <ellipse cx="649" cy="263" rx="14" ry="30" transform="rotate(-35 649 263)" />
+        <ellipse cx="713" cy="220" rx="16" ry="30" transform="rotate(35 713 220)" />
+        <ellipse cx="721" cy="307" rx="15" ry="29" transform="rotate(50 721 307)" />
+        <ellipse cx="680" cy="202" rx="15" ry="31" />
+      </g>
+      <path fill="#ba9d78" d="M646 361h72l-11 75h-50z" />
+      <path fill="#d4b68c" d="M641 355h82v13h-82z" />
+    </g>
+    <path fill="#ffffff" fill-opacity=".6" d="M461 65h112v101H461z" />
+    <path stroke="#948e78" stroke-width="5" d="M471 75h92v81h-92z" />
+  </g>
+  <path fill="#ffffff" fill-opacity=".35" d="M484 143a31 31 0 0 1 62 0z" />
+  <circle cx="534" cy="98" r="10" fill="#c1a46f" />
 </svg>

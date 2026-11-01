@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-01 (Europe/Brussels).
 
+## Palette-aware illustrations (2026-11-01)
+
+All three illustrations now use a background tint derived from their effective inherited text color (65% currentColor mixed with white), so S5 is green-toned and S2 blue-toned. Hero shapes use translucent highlights/shadows and a warm translucent sun. The two SVG assets replace fixed green shapes with neutral translucent fills; masks cut through earlier artwork layers so plants, hills and chairs reveal the actual image background even over opaque furniture/floors. Warm wood, yellow light and other accents remain. Image background-color declarations can override the baseline through the normal schema/cascade. Alternative text no longer promises green chairs.
+
+Build/typecheck and four existing website browser checks pass. A focused browser check verifies composited hill/plant pixels shift from S5 toward S2 blue, matching backgrounds across all three illustrations, and captures screenshots for visual review. S5/S2 screenshots were inspected. No provider calls or deployment performed. This visual follow-on is complete; hosted verification remains separate.
+
 ## V2 editing presentation correction (2026-11-01)
 
 Edit highlighting now uses #00c800, superseding the earlier CSS green. The add-declaration property dropdown input, value input, Add and Cancel occupy one row, with validation errors below. Inspector semicolons are removed from display; compiled CSS retains normal syntax. Build/typecheck, three focused mocked Edge checks and `git diff --check` pass. Browser checks verify the new color, single-row form geometry without overflow, and absent semicolon markup alongside existing editing/snapshot behavior. Visual QA inspected the inline form at 1280px. No provider request or deployment performed. This presentation correction is complete; hosted verification remains a separate next action.

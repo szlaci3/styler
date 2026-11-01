@@ -60,7 +60,7 @@ export function SampleWebsite({ style }: { style: Style }) {
             ].map(space => (
               <article className="sample-card" key={space.kind}>
                 <img className="sample-image sample-space-image" src={space.kind === 'quiet' ? '/images/quiet-studio.svg' : '/images/common-table.svg'}
-                  alt={space.kind === 'quiet' ? 'Illustration of a sunlit studio with an arched window and a private desk' : 'Illustration of a shared studio table with green chairs and plants'} width="800" height="500" />
+                  alt={space.kind === 'quiet' ? 'Illustration of a sunlit studio with an arched window and a private desk' : 'Illustration of a shared studio table with chairs and plants'} width="800" height="500" />
                 <div className="sample-card-content"><span className="sample-eyebrow">{space.tag}</span><h3>{space.name}</h3><p className="sample-copy">{space.description}</p>
                   <button className="sample-card-link" aria-expanded={selectedSpace === space.kind} onClick={() => setSelectedSpace(selectedSpace === space.kind ? null : space.kind)}>Take a closer look <span aria-hidden="true">{selectedSpace === space.kind ? '−' : '↗'}</span></button>
                   {selectedSpace === space.kind && <p className="sample-space-detail">{space.kind === 'quiet' ? 'A private desk, reading lamp, and a view of the garden. Yours for a morning or the whole day.' : 'A shared table for up to six people, a whiteboard, and plenty of fresh coffee.'}</p>}
