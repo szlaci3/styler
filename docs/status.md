@@ -2,7 +2,17 @@
 
 Last updated: 2026-11-01 (Europe/Brussels).
 
+## Saved presets with Dexie (2026-11-01)
+
+The user-authorized Save preset follow-on is complete locally. The Presets footer saves the currently selected style plus applied locks/typed edits as S8, S9, onward. Unset remains a generation-only omission constraint and does not remove declarations from the saved current appearance. Saving neither selects a new card nor changes generation inputs/countdown. Saved cards work for preview and inspiration, and their declarations join the inspector. Generated results and saved presets can themselves be saved. S1–S7 remain immutable.
+
+Dexie 4.4.7 stores validated snapshots in browser IndexedDB (`styler-presets`). A read/write transaction allocates unique sequential numbers even across tabs; live queries refresh other tabs while retaining unchanged inspiration object identities. Saved layer stacks preserve native lock precedence over overlapping original rules, including when saving an already saved preset. Current live locks still sit above the saved layers. Reads revalidate stored data; malformed records are skipped with a visible warning. Load errors offer Retry loading; failed writes report an error and create no phantom card. Storage is local to this browser and origin, without cloud sync. Generated history and unsaved edits still reset on reload.
+
+Validation: build/typecheck, **39 offline checks**, **15 focused Edge checks**, and diff check pass. Browser checks cover persistence, added declarations, Unset semantics, saved and live cascade precedence, immutable S8 versus S9, inspiration, generated sources, numbering across tabs, quota/write failure and retry, layout and countdown behavior. Visual QA inspected the saved-presets screenshot. No real-provider call, deployment, commit or push performed. Hosted verification remains a separate next action; rename/delete/export were not requested.
+
 ## Palette-aware illustrations (2026-11-01)
+
+Dark-style follow-on: detect darkness from the effective page background's relative luminance (below 0.179), independently of OS preference. Dark styles use that page background directly as the illustration base, bypassing HSL; light styles retain `hsl(from currentColor h 50% 35%)`. Detection updates with selection, locks/typed edits and settled transitions. Explicit image background declarations still retain normal cascade priority. Build/typecheck, diff check and both focused Edge illustration checks pass, including S3, a typed dark page-background lock across selection, Reset back to light, and OS-preference independence. No provider calls or deployment performed.
 
 Follow-on color correction: backgrounds now use `hsl(from currentColor h 50% 35%)`, preserving the effective text hue with fixed 50% saturation and 35% lightness. This supersedes the white-mixing formula below. Build/typecheck, diff check and the focused Edge illustration check pass.
 

@@ -1,7 +1,7 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { compileStyle, type Style } from '../../shared/style.ts';
 
-export function SampleWebsite({ style }: { style: Style }) {
+export function SampleWebsite({ style, savedLayers }: { style: Style; savedLayers?: readonly Style[] }) {
   const spaces = useRef<HTMLElement>(null);
   const membership = useRef<HTMLElement>(null);
   const visit = useRef<HTMLElement>(null);
@@ -31,7 +31,9 @@ export function SampleWebsite({ style }: { style: Style }) {
 
   return (
     <div className="preview-root">
-      <style data-preview-selected>{`@layer selected { ${compileStyle(style)} }`}</style>
+      <style data-preview-selected>{`@layer selected { ${savedLayers
+        ? savedLayers.map((layer, index) => `@layer saved${index} { ${compileStyle(layer)} }`).join('\n')
+        : compileStyle(style)} }`}</style>
       <article className="sample-page" aria-label="Form and Field sample website">
         <nav className="sample-nav" aria-label="Sample website navigation">
           <span className="sample-brand"><span className="sample-brand-mark" aria-hidden="true">✳</span> form & field<span className="sample-brand-period">.</span></span>

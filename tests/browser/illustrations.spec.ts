@@ -1,5 +1,23 @@
 import { test, expect } from '@playwright/test';
 
+test('dark styles use the effective page background and light styles restore HSL', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'light' });
+  await page.goto('/');
+  const art = page.locator('.sample-hero-art, .sample-space-image');
+  await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
+  for (const element of await art.all()) await expect(element).toHaveCSS('background-color', 'rgb(33, 30, 44)');
+  // A typed page-background lock must also determine detection and the tint.
+  const background = page.getByRole('textbox', { name: 'Edit page background-color', exact: true });
+  await background.fill('#102030'); await background.press('Enter');
+  await page.getByRole('button', { name: 'S2: Blueprint', exact: true }).click();
+  for (const element of await art.all()) await expect(element).toHaveCSS('background-color', 'rgb(16, 32, 48)');
+  await page.getByRole('button', { name: 'Reset page background-color', exact: true }).click();
+  await expect(page.locator('.sample-page')).not.toHaveAttribute('style', /--dark-illustration-background/);
+  // OS dark preference must not classify a light selected style as dark.
+  await page.emulateMedia({ colorScheme: 'dark' });
+  for (const element of await art.all()) await expect(element).not.toHaveCSS('background-color', 'rgb(16, 32, 48)');
+});
+
 test('transparent illustration layers take the S5 green and S2 blue palettes', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.emulateMedia({ reducedMotion: 'reduce' });

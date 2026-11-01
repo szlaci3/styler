@@ -7,7 +7,23 @@ import { readEffective, type InspectionGroup } from './inspection.ts';
 import sampleCss from './sample.css?inline';
 import boundaryCss from './boundary.css?inline';
 
-export function Preview({ style, constraints, groups, onInspect, onRoot }: { style: Style; constraints: Snapshot; groups: readonly InspectionGroup[]; onInspect: (values: Record<string, string>) => void; onRoot: (root: ShadowRoot) => void }) {
+function updateIllustrationBackground(root: ShadowRoot) {
+  const page = root.querySelector<HTMLElement>('.sample-page');
+  if (!page) return;
+  const background = getComputedStyle(page).backgroundColor;
+  const channels = background.match(/[\d.]+/g)?.map(Number);
+  if (!channels || channels.length < 3) return;
+  const alpha = channels[3] ?? 1;
+  const linear = channels.slice(0, 3).map(channel => {
+    const value = (channel * alpha + 255 * (1 - alpha)) / 255;
+    return value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4;
+  });
+  const luminance = .2126 * linear[0]! + .7152 * linear[1]! + .0722 * linear[2]!;
+  if (luminance < .179) page.style.setProperty('--dark-illustration-background', background);
+  else page.style.removeProperty('--dark-illustration-background');
+}
+
+export function Preview({ style, savedLayers, constraints, groups, onInspect, onRoot }: { style: Style; savedLayers?: readonly Style[]; constraints: Snapshot; groups: readonly InspectionGroup[]; onInspect: (values: Record<string, string>) => void; onRoot: (root: ShadowRoot) => void }) {
   const [root, setRoot] = useState<ShadowRoot | null>(null);
   const attach = useCallback((host: HTMLDivElement | null) => {
     if (host) setRoot(host.shadowRoot ?? host.attachShadow({ mode: 'open' }));
@@ -16,7 +32,10 @@ export function Preview({ style, constraints, groups, onInspect, onRoot }: { sty
   useEffect(() => {
     if (!root) return;
     onRoot(root);
-    const update = () => onInspect(readEffective(root, groups));
+    const update = () => {
+      updateIllustrationBackground(root);
+      onInspect(readEffective(root, groups));
+    };
     update();
     const timer = setTimeout(update, 380);
     root.addEventListener('transitionend', update);
@@ -31,7 +50,7 @@ export function Preview({ style, constraints, groups, onInspect, onRoot }: { sty
     {root && createPortal(<>
       <style>{`@layer baseline, selected, locks; @layer baseline { ${boundaryCss}\n${sampleCss} }`}</style>
       <style data-preview-locks>{`@layer locks { ${compileLocks(constraints)} }`}</style>
-      <SampleWebsite style={style} />
+      <SampleWebsite style={style} savedLayers={savedLayers} />
     </>, root)}
   </>;
 }

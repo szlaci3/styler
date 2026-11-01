@@ -10,6 +10,7 @@ import { Preview } from './preview/Preview.tsx';
 import { ENABLED_EXPRESSIONS } from '../shared/generation.ts';
 import { IntroductionVideo } from './components/IntroductionVideo.tsx';
 import { EditableValue, AddDeclaration, type CssEdits } from './components/CssEditing.tsx';
+import { useSavedPresets } from './styles/savedPresets.ts';
 
 function Inspector({ values, constraints, groups, edits, onEdit, onRemoveEdit, onToggle, active, remaining, unusedConstraints, onGenerate, inspirationId, onClearInspiration }: { values: Record<string, string>; constraints: Snapshot; groups: readonly InspectionGroup[];
   edits: CssEdits;
@@ -81,14 +82,17 @@ function lockedValue(constraints: Snapshot, selector: SelectorId, property: Prop
 
 export function App() {
   const generation = useGeneration();
+  const savedPresets = useSavedPresets();
+  const [saveMessage, setSaveMessage] = useState('');
+  const allPresets = [...presets, ...savedPresets.saved.map(row => row.style)];
   const editMayArm = useRef(false);
   // Retain discovered declaration rows for the session, so locks remain reachable
   // even after selecting a preset that omits that generated declaration.
   const [edits, setEdits] = useState<CssEdits>({});
-  const groups = useMemo(() => makeInspectionGroups(generation.slots.flatMap(slot => slot.style ? [slot.style] : [])).map(group => ({
+  const groups = useMemo(() => makeInspectionGroups([...savedPresets.saved.map(row => row.style), ...generation.slots.flatMap(slot => slot.style ? [slot.style] : [])]).map(group => ({
     ...group, properties: [...new Set([...group.properties, ...Object.keys(edits)
       .filter(key => key.startsWith(`${group.selectorId}:`)).map(key => key.split(':')[1] as Property)])],
-  })), [generation.slots, edits]);
+  })), [generation.slots, edits, savedPresets.saved]);
   const generatedRail = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!generation.scrollTarget || !generatedRail.current) return;
@@ -135,8 +139,16 @@ export function App() {
   }
   const [selectedId, setSelectedId] = useState('S1');
   const [inspirationId, setInspirationId] = useState<string | null>(null);
-  const styles = [...presets, ...generation.slots.flatMap(slot => slot.style ? [slot.style] : [])];
+  const styles = [...allPresets, ...generation.slots.flatMap(slot => slot.style ? [slot.style] : [])];
   const selected = styles.find(style => style.id === selectedId)!;
+  const savedLayers = savedPresets.saved.find(row => row.style.id === selectedId)?.layers;
+  async function saveCurrentPreset() {
+    setSaveMessage('');
+    try {
+      const saved = await savedPresets.save(selected, constraints, savedLayers);
+      if (saved) setSaveMessage(`Saved as ${saved.style.id}.`);
+    } catch { setSaveMessage('Could not save preset. Please try again.'); }
+  }
   const inspiration = styles.find(style => style.id === inspirationId) ?? null;
   // Constraints are canonical; compare values rather than edit counts so reverting
   // to the captured inputs clears the notice. Inspiration styles are immutable.
@@ -178,7 +190,7 @@ export function App() {
             </div>
           </header>
           <div className="preview-scroll scroll-region" tabIndex={0} role="region" aria-label="Scrollable website preview">
-            <Preview groups={groups} constraints={constraints} style={selected} onInspect={setValues} onRoot={setRoot} />
+            <Preview groups={groups} constraints={constraints} style={selected} savedLayers={savedLayers} onInspect={setValues} onRoot={setRoot} />
           </div>
           <footer className="preview-status">
             <span><span className="status-dot" /> Same content. A different feeling.</span>
@@ -189,10 +201,17 @@ export function App() {
         <section className="style-panel workspace-panel" aria-labelledby="presets-label">
           <header className="panel-heading rail-heading"><span className="panel-kicker">01</span><h2 id="presets-label">Presets</h2></header>
           <div className="rail-scroll scroll-region" tabIndex={0} role="region" aria-label="Scrollable predefined styles">
-            {presets.map(style => <StyleCard key={style.id} style={style} active={style.id === selectedId} inspired={style.id === inspirationId} onSelect={() => setSelectedId(style.id)} onInspire={() => toggleInspiration(style.id)} />)}
+            {allPresets.map(style => <StyleCard key={style.id} style={style} active={style.id === selectedId} inspired={style.id === inspirationId} onSelect={() => setSelectedId(style.id)} onInspire={() => toggleInspiration(style.id)} />)}
             <div className="rail-bottom-note"><span aria-hidden="true">✳</span><p>A starting<br />point.</p></div>
           </div>
-          <footer className="rail-footer">7 STYLES</footer>
+          <footer className="presets-footer">
+            <button className="save-preset-button" disabled={!savedPresets.ready || savedPresets.saving} onClick={saveCurrentPreset}>
+              {savedPresets.saving ? 'Saving…' : 'Save preset'}
+            </button>
+            <span>{allPresets.length} STYLES</span>
+            {(savedPresets.error || saveMessage) && <p role="status" aria-label="Preset storage">{savedPresets.error || saveMessage}</p>}
+            {savedPresets.error && <button className="save-preset-button" onClick={savedPresets.reload}>Retry loading</button>}
+          </footer>
         </section>
 
         <section className="style-panel workspace-panel generated-panel" aria-labelledby="generated-label">
