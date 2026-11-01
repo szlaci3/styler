@@ -4,6 +4,8 @@ Last updated: 2026-11-01 (Europe/Brussels).
 
 ## Palette-aware illustrations (2026-11-01)
 
+Follow-on color correction: backgrounds now use `hsl(from currentColor h 50% 35%)`, preserving the effective text hue with fixed 50% saturation and 35% lightness. This supersedes the white-mixing formula below. Build/typecheck, diff check and the focused Edge illustration check pass.
+
 All three illustrations now use a background tint derived from their effective inherited text color (65% currentColor mixed with white), so S5 is green-toned and S2 blue-toned. Hero shapes use translucent highlights/shadows and a warm translucent sun. The two SVG assets replace fixed green shapes with neutral translucent fills; masks cut through earlier artwork layers so plants, hills and chairs reveal the actual image background even over opaque furniture/floors. Warm wood, yellow light and other accents remain. Image background-color declarations can override the baseline through the normal schema/cascade. Alternative text no longer promises green chairs.
 
 Build/typecheck and four existing website browser checks pass. A focused browser check verifies composited hill/plant pixels shift from S5 toward S2 blue, matching backgrounds across all three illustrations, and captures screenshots for visual review. S5/S2 screenshots were inspected. No provider calls or deployment performed. This visual follow-on is complete; hosted verification remains separate.
