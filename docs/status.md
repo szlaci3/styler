@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-01 (Europe/Brussels).
 
+## Saved Auto generation switch (2026-11-01)
+
+The user-authorized follow-on is complete locally. Generate is half its former width, with an accessible `Auto (8 sec)` switch beside it, on by default. The preference persists through Dexie in a new settings table; the database upgrade preserves existing saved presets. Off cancels any pending countdown and prevents constraint/inspiration edits from scheduling generation. Manual Generate still works. Enabling Auto or loading its saved value never starts a countdown or generation; only a subsequent eligible input change can arm the timer. Active batches continue unchanged and never queue another batch through toggling. Storage failures are visible, with load failure leaving Auto off and write failure retaining the current session choice.
+
+Validation: production build/typecheck, **39 offline checks**, **30 focused Edge checks**, and diff check pass. Browser coverage includes default-on behavior, final-second cancellation, manual generation while off, keyboard enable without scheduling, reload in both states, existing database migration, storage write failure, half-width geometry, saved presets, active-request edits and desktop regressions. The 1280px screenshot was visually inspected. The sandboxed test server stalled; the successful run used the outside-sandbox test workflow with the provider key disabled and mocked generation. No real-provider request, deployment, commit or push performed. This follow-on is complete; hosted verification remains a separate next action.
+
 ## Saved presets with Dexie (2026-11-01)
 
 The user-authorized Save preset follow-on is complete locally. The Presets footer saves the currently selected style plus applied locks/typed edits as S8, S9, onward. Unset remains a generation-only omission constraint and does not remove declarations from the saved current appearance. Saving neither selects a new card nor changes generation inputs/countdown. Saved cards work for preview and inspiration, and their declarations join the inspector. Generated results and saved presets can themselves be saved. S1–S7 remain immutable.

@@ -136,7 +136,7 @@ test('page load and preview interactions never generate; manual send cancels cou
   expect(calls).toBe(0);
   const lock = page.getByRole('button', { name: 'Lock button color', exact: true });
   await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
-  await page.getByRole('switch').uncheck();
+  await page.getByRole('switch', { name: 'Quiet hours' }).uncheck();
   await page.getByRole('textbox', { name: 'Email address' }).fill('manual@example.com');
   await page.getByRole('region', { name: 'Scrollable predefined styles', exact: true }).hover();
   await page.mouse.wheel(0, 400);

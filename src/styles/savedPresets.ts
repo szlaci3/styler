@@ -1,11 +1,10 @@
-import { Dexie, liveQuery, type Table } from 'dexie';
+import { liveQuery } from 'dexie';
 import { useEffect, useRef, useState } from 'react';
 import { parseStyle, type Style } from '../../shared/style.ts';
 import { constrainStyle, lockStyle, type Snapshot } from '../../shared/constraints.ts';
+import { db } from '../storage.ts';
 
 export type SavedPreset = { number: number; style: Style; layers: readonly Style[] };
-const db = new Dexie('styler-presets') as Dexie & { presets: Table<SavedPreset, number> };
-db.version(1).stores({ presets: 'number' });
 
 function validatePreset(row: SavedPreset): SavedPreset {
   if (!Number.isSafeInteger(row.number) || row.number < 8 || !Array.isArray(row.layers) || !row.layers.length) throw new Error('Invalid saved preset.');

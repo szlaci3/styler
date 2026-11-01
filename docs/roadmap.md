@@ -40,6 +40,8 @@ The user explicitly selected V2: type changes to existing values and add declara
 
 ## Next recommendation
 
+Authorized follow-on (2026-11-01): halve Generate width and add a default-on `Auto (8 sec)` switch persisted with Dexie. Off cancels/prevents countdowns; enabling or loading it never schedules generation. Manual generation and active-batch snapshot/no-queue rules remain. See status.md for validation and completion.
+
 Authorized follow-on (2026-11-01): Save preset via Dexie, capturing the current style and applied locks as persistent browser-local S8/S9/etc. Complete locally; acceptance covers reload, immutable snapshots, native cascade, preview/inspiration, safe validation, concurrency, storage errors and unchanged generation scheduling. See status.md for observed checks. This explicitly supersedes the earlier blanket deferral of persistence for saved presets only.
 
 M1–M18 are complete. Local V1 acceptance remains m18-v1-acceptance.md; the subsequently authorized Netlify background migration is documented in netlify-deployment.md. V2 declaration editing is the selected follow-on above. After local editing acceptance, hosted verification remains a separate next action: deploy the repository with its Functions-scoped key and verify health plus one deliberate hosted batch. A future integration blocker does not authorize switching providers.

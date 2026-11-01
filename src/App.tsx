@@ -11,8 +11,10 @@ import { ENABLED_EXPRESSIONS } from '../shared/generation.ts';
 import { IntroductionVideo } from './components/IntroductionVideo.tsx';
 import { EditableValue, AddDeclaration, type CssEdits } from './components/CssEditing.tsx';
 import { useSavedPresets } from './styles/savedPresets.ts';
+import { useAutoGeneration } from './generation/useAutoGeneration.ts';
 
-function Inspector({ values, constraints, groups, edits, onEdit, onRemoveEdit, onToggle, active, remaining, unusedConstraints, onGenerate, inspirationId, onClearInspiration }: { values: Record<string, string>; constraints: Snapshot; groups: readonly InspectionGroup[];
+function Inspector({ values, constraints, groups, edits, onEdit, onRemoveEdit, onToggle, active, remaining, unusedConstraints, onGenerate, auto, onAutoChange, inspirationId, onClearInspiration }: { values: Record<string, string>; constraints: Snapshot; groups: readonly InspectionGroup[];
+  auto: ReturnType<typeof useAutoGeneration>; onAutoChange: (enabled: boolean) => void;
   edits: CssEdits;
   onEdit: (selector: SelectorId, property: Property, value: string, added?: boolean) => void;
   onRemoveEdit: (selector: SelectorId, property: Property) => void;
@@ -62,9 +64,17 @@ function Inspector({ values, constraints, groups, edits, onEdit, onRemoveEdit, o
           {inspirationId ? `Inspiration: ${inspirationId}` : 'No inspiration selected.'}
           {inspirationId && <button className="clear-inspiration" onClick={onClearInspiration}>Clear inspiration</button>}
         </div>
+        <div className="generation-actions">
         <button className="generate-button" disabled={active} onClick={onGenerate} aria-describedby="generation-availability">
           <span aria-hidden="true">✳</span> {active ? 'Generating…' : remaining !== null && remaining <= 3 ? `Sending in ${remaining}…` : 'Generate'} <span aria-hidden="true">↗</span>
         </button>
+        <label className="auto-generation">
+          <input type="checkbox" role="switch" checked={auto.enabled} disabled={!auto.ready} onChange={event => onAutoChange(event.target.checked)} />
+          <span className="auto-generation-track" aria-hidden="true" />
+          <span>Auto (8 sec)</span>
+        </label>
+        </div>
+        {auto.error && <p role="status" aria-label="Auto preference storage">{auto.error}</p>}
         <p id="generation-availability" role="status" aria-label="Generation constraints">{active && unusedConstraints
           ? 'Edits apply to the preview. This batch uses earlier constraints.'
           : remaining !== null && !active ? 'Sending eight seconds after the last constraint change.'
@@ -83,6 +93,7 @@ function lockedValue(constraints: Snapshot, selector: SelectorId, property: Prop
 export function App() {
   const generation = useGeneration();
   const savedPresets = useSavedPresets();
+  const auto = useAutoGeneration();
   const [saveMessage, setSaveMessage] = useState('');
   const allPresets = [...presets, ...savedPresets.saved.map(row => row.style)];
   const editMayArm = useRef(false);
@@ -111,7 +122,7 @@ export function App() {
       { selectorId, property, state: 'locked', value }]);
     setEdits(current => ({ ...current, [key]: current[key] ?? { kind: added ? 'added' : 'changed',
       previous: constraints.find(c => c.selectorId === selectorId && c.property === property) } }));
-    editMayArm.current = !generation.isActive();
+    editMayArm.current = auto.ready && auto.enabled && !generation.isActive();
     setConstraints(next); setNotice('');
   }
   function onRemoveEdit(selectorId: SelectorId, property: Property) {
@@ -119,7 +130,7 @@ export function App() {
     if (!edit) return;
     const next = constraints.filter(c => c.selectorId !== selectorId || c.property !== property);
     if (edit.previous) next.push(edit.previous);
-    editMayArm.current = !generation.isActive();
+    editMayArm.current = auto.ready && auto.enabled && !generation.isActive();
     setConstraints(parseSnapshot(next));
     setEdits(current => { const copy = { ...current }; delete copy[key]; return copy; });
     setNotice('');
@@ -134,7 +145,7 @@ export function App() {
       setNotice('This effective value is outside the supported style vocabulary.'); return;
     }
     setNotice('');
-    editMayArm.current = !generation.isActive();
+    editMayArm.current = auto.ready && auto.enabled && !generation.isActive();
     setConstraints(toggleConstraint(constraints, selector, property, state, value));
   }
   const [selectedId, setSelectedId] = useState('S1');
@@ -156,10 +167,15 @@ export function App() {
     JSON.stringify(constraints) !== JSON.stringify(generation.lastBatchContext.constraints)
     || (inspiration?.id ?? null) !== (generation.lastBatchContext.inspiration?.id ?? null));
   const toggleInspiration = (id: string | null) => {
-    editMayArm.current = !generation.isActive();
+    editMayArm.current = auto.ready && auto.enabled && !generation.isActive();
     setInspirationId(current => current === id ? null : id);
   };
-  const countdown = useCountdown(() => generation.generate(constraints, inspiration), () => !generation.isActive());
+  const countdown = useCountdown(() => generation.generate(constraints, inspiration), () => auto.ready && auto.enabled && !generation.isActive());
+  function onAutoChange(enabled: boolean) {
+    countdown.cancel();
+    editMayArm.current = false;
+    auto.update(enabled);
+  }
   const previousInputs = useRef({ constraints, inspiration });
   useEffect(() => {
     if (previousInputs.current.constraints === constraints && previousInputs.current.inspiration === inspiration) return;
@@ -228,7 +244,7 @@ export function App() {
           </div>
           <footer className="rail-footer">{generation.slots.length} STYLES</footer>
         </section>
-        <Inspector groups={groups} edits={edits} onEdit={onEdit} onRemoveEdit={onRemoveEdit} values={values} constraints={constraints} onToggle={onToggle} active={generation.active} remaining={countdown.remaining} unusedConstraints={unusedConstraints} onGenerate={generate} inspirationId={inspirationId} onClearInspiration={() => toggleInspiration(null)} />
+        <Inspector groups={groups} edits={edits} onEdit={onEdit} onRemoveEdit={onRemoveEdit} values={values} constraints={constraints} onToggle={onToggle} active={generation.active} remaining={countdown.remaining} unusedConstraints={unusedConstraints} onGenerate={generate} auto={auto} onAutoChange={onAutoChange} inspirationId={inspirationId} onClearInspiration={() => toggleInspiration(null)} />
         {notice && <div className="app-notice" role="status">{notice}</div>}
       </main>
     </div>

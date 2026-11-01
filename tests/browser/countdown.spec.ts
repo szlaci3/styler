@@ -8,6 +8,7 @@ async function openWithPausedClock(page: Page) {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.clock.install({ time: new Date('2026-10-30T12:00:00Z') });
   await page.goto('/');
+  await expect(page.getByRole('switch', { name: 'Auto (8 sec)' })).toBeEnabled();
   await page.clock.pauseAt(new Date('2026-10-30T12:01:00Z'));
 }
 
@@ -97,7 +98,7 @@ test('preview selection, hover, scrolling and sample controls do not arm or post
   const interact = async () => {
     await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
     await page.getByRole('textbox', { name: 'Email address' }).fill('countdown@example.com');
-    await page.getByRole('switch').uncheck();
+    await page.getByRole('switch', { name: 'Quiet hours' }).uncheck();
     await page.getByText('Can I come for just one day?', { exact: true }).click();
     await page.getByRole('region', { name: 'Scrollable predefined styles', exact: true }).evaluate(element => { element.scrollTop = 100; });
     await page.locator('[data-declaration="page:color"]').hover();
@@ -155,8 +156,10 @@ test('active-batch edits never arm or queue a timer; a later fresh edit can star
   await expect.poll(() => requests.length).toBe(2);
   await expect(page.locator('.generate-button')).toHaveAccessibleName('Generating…');
   await expect(page.locator('.generate-button')).toBeDisabled();
+  await page.getByRole('switch', { name: 'Auto (8 sec)' }).uncheck();
   await page.getByRole('button', { name: 'Lock button color', exact: true }).click();
   await page.getByRole('button', { name: 'Use S2 as inspiration', exact: true }).click();
+  await page.getByRole('switch', { name: 'Auto (8 sec)' }).check();
   await page.clock.runFor(60_000);
   expect(requests).toHaveLength(2);
   released = true; releases.forEach(resolve => resolve());

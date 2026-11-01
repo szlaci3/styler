@@ -81,7 +81,16 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2
 .css-declaration dd { color: #a9bc96; margin: 0; overflow-wrap: anywhere; }
 .generation-footer { flex-shrink: 0; padding: 17px 20px 13px; background: #1d2532; border-top: 1px solid #38414e; }
 .generation-footer-caption { font-size: 10px; color: #b3bcc6; display: flex; align-items: center; gap: 7px; margin-bottom: 13px; }
-.generate-button { width: 100%; padding: 12px 14px; display: flex; align-items: center; justify-content: center; gap: 9px; color: #e5dbbf; background: #393b35; border: 1px solid #726747; border-radius: 6px; font-size: 12px; }
+.generation-actions { display: flex; align-items: center; gap: 12px; }
+.generate-button { width: 50%; flex-shrink: 0; padding: 12px 8px; display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; color: #e5dbbf; background: #393b35; border: 1px solid #726747; border-radius: 6px; font-size: 12px; }
+.auto-generation { display: flex; align-items: center; gap: 7px; position: relative; color: #dce1e9; font-size: 11px; white-space: nowrap; cursor: pointer; }
+.auto-generation input { position: absolute; width: 32px; height: 18px; margin: 0; opacity: 0; cursor: pointer; }
+.auto-generation-track { width: 32px; height: 18px; flex-shrink: 0; border: 1px solid #778291; border-radius: 10px; background: #343e50; pointer-events: none; }
+.auto-generation-track::after { content: ''; display: block; width: 12px; height: 12px; margin: 2px; border-radius: 50%; background: #e5dbbf; }
+.auto-generation input:checked + .auto-generation-track { background: #626b47; border-color: #b2ad80; }
+.auto-generation input:checked + .auto-generation-track::after { transform: translateX(14px); }
+.auto-generation input:focus-visible + .auto-generation-track { outline: 2px solid #b49b5c; outline-offset: 3px; }
+.auto-generation input:disabled ~ span { opacity: .55; }
 .generate-button span:first-child { font-size: 17px; }
 .generate-button span:last-child { margin-left: auto; }
 .generate-button span:first-child { margin-right: auto; }

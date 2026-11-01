@@ -649,6 +649,8 @@ Only one inspiration card can be locked at a time, but multiple CSS declarations
 
 There is one shared eight-second inactivity timer.
 
+Auto preference follow-on (2026-11-01): Generate occupies half its previous width, with an accessible `Auto (8 sec)` switch beside it. Auto defaults on and its boolean preference persists through Dexie/IndexedDB. Switching off cancels a pending countdown and prevents edits/inspiration changes from arming one; manual Generate remains available. Switching on only enables countdowns for subsequent eligible changes: it neither starts a timer nor generates. Loading the saved preference never generates, and scheduling waits until the preference has loaded. Toggling during an active request does not cancel that request or queue another batch.
+
 ### Timer triggers
 
 The timer starts or restarts when:

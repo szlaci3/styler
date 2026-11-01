@@ -6,7 +6,7 @@ test('effective inspector includes inherited and conditional values and settles 
   await expect(row.locator('input')).toHaveValue('rgb(33, 62, 67)');
   await page.getByRole('button', { name: 'S3: After Hours', exact: true }).click();
   await expect(row.locator('input')).toHaveValue('rgb(243, 234, 247)');
-  await page.getByRole('switch').uncheck();
+  await page.getByRole('switch', { name: 'Quiet hours' }).uncheck();
   await expect(page.locator('.css-rule').filter({ has: page.locator('.css-selector', { hasText: '.sample-switch-label input:checked' }) })).toContainText('background-color');
 });
 
