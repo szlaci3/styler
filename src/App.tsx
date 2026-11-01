@@ -40,7 +40,7 @@ function Inspector({ values, constraints, groups, edits, onEdit, onRemoveEdit, o
                 <dt className={edit?.kind === 'added' ? 'css-edited' : undefined}>{property}<span>:</span></dt>
                 <dd><EditableValue selector={rule.selectorId} property={property}
                   value={lockedValue(constraints, rule.selectorId, property) ?? values[`${rule.selectorId}:${property}`] ?? '…'}
-                  edited={!!edit} onEdit={onEdit} /><span>;</span></dd>
+                  edited={!!edit} onEdit={onEdit} /></dd>
                 <span className="declaration-controls">{edit ? <>
                   <button disabled aria-label={`Lock ${rule.selectorId} ${property}`} aria-pressed="true">L</button>
                   <button className="css-remove-edit" aria-label={`${edit.kind === 'added' ? 'Delete' : 'Reset'} ${rule.selectorId} ${property}`}

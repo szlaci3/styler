@@ -1,6 +1,10 @@
 # Current development status
 
-Last updated: 2026-10-31 (Europe/Brussels).
+Last updated: 2026-11-01 (Europe/Brussels).
+
+## V2 editing presentation correction (2026-11-01)
+
+Edit highlighting now uses #00c800, superseding the earlier CSS green. The add-declaration property dropdown input, value input, Add and Cancel occupy one row, with validation errors below. Inspector semicolons are removed from display; compiled CSS retains normal syntax. Build/typecheck, three focused mocked Edge checks and `git diff --check` pass. Browser checks verify the new color, single-row form geometry without overflow, and absent semicolon markup alongside existing editing/snapshot behavior. Visual QA inspected the inline form at 1280px. No provider request or deployment performed. This presentation correction is complete; hosted verification remains a separate next action.
 
 ## V2 declaration editing (2026-10-31)
 

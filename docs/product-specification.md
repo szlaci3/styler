@@ -730,6 +730,8 @@ The eight-second timer supplements the Generate button; it does not replace it.
 
 ## 13. V2 — custom CSS declarations
 
+Presentation correction (2026-11-01): use #00c800 for edited text instead of the CSS green keyword. Keep the property dropdown input, value input, Add and Cancel on one line. Omit displayed inspector semicolons; users edit values without adding or removing punctuation. This supersedes the original color choice below.
+
 Authorized V2 follow-on (2026-10-31), superseding the original deferral and lifetime question below: users can type existing declaration values and add supported declarations with a + control under existing selectors. Accept changes on Enter or blur; reject values outside the shared bounded schema. Escape cancels a draft. Changed values use CSS `green` (#008000) and L / Reset. Added property names and values use the same green and L / Del. L is automatically active and disabled; Reset/Del is the only way to remove the edit. Further typing updates the locked value. Reset restores the constraint preceding the first edit; Del removes the added line/override. Edits persist across selections and generations in session memory until explicitly removed or the page reloads. Accepted generated styles keep their own immutable values after an edit is removed. Edits participate in normal preview locks, generation snapshots and the shared countdown; active-request edits do not queue work. No arbitrary CSS selectors, unsupported properties or cross-session persistence are included.
 
 Original V2 proposal (historical):

@@ -15,7 +15,7 @@ test('typed values lock, stay green across selections, and Reset restores the pr
   const lock = page.getByRole('button', { name: 'Lock button background-color', exact: true });
   await lock.click();
   await input.fill('#008000'); await input.press('Enter');
-  await expect(input).toHaveCSS('color', 'rgb(0, 128, 0)');
+  await expect(input).toHaveCSS('color', 'rgb(0, 200, 0)');
   await expect(lock).toBeDisabled();
   await expect(lock).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'Unset button background-color', exact: true })).toHaveCount(0);
@@ -47,6 +47,14 @@ test('invalid edits never reach preview; added declarations use L/Del and disapp
   const property = 'font-style', value = 'italic';
   expect(existing).not.toContain(property);
   await page.getByRole('button', { name: 'Add declaration to page', exact: true }).click();
+  const form = page.locator('.css-add-form');
+  const bounds = await form.locator('input, button').evaluateAll(elements => elements.map(element => {
+    const rect = element.getBoundingClientRect(); return { top: rect.top, bottom: rect.bottom, right: rect.right };
+  }));
+  expect(Math.max(...bounds.map(rect => rect.top))).toBeLessThan(Math.min(...bounds.map(rect => rect.bottom)));
+  expect(bounds.at(-1)!.right).toBeLessThanOrEqual((await form.boundingBox())!.x + (await form.boundingBox())!.width);
+  await page.screenshot({ path: 'test-results/v2-add-declaration-inline.png' });
+  await expect(page.locator('.css-declaration dd > span')).toHaveCount(0);
   await page.getByLabel('New property for page', { exact: true }).fill('position');
   await page.getByRole('textbox', { name: 'New value for page', exact: true }).fill('fixed');
   await page.getByRole('button', { name: 'Add', exact: true }).click();
@@ -55,8 +63,8 @@ test('invalid edits never reach preview; added declarations use L/Del and disapp
   await page.getByRole('textbox', { name: 'New value for page', exact: true }).fill(value);
   await page.getByRole('button', { name: 'Add', exact: true }).click();
   const row = page.locator(`[data-declaration="page:${property}"]`);
-  await expect(row.locator('dt')).toHaveCSS('color', 'rgb(0, 128, 0)');
-  await expect(row.locator('input')).toHaveCSS('color', 'rgb(0, 128, 0)');
+  await expect(row.locator('dt')).toHaveCSS('color', 'rgb(0, 200, 0)');
+  await expect(row.locator('input')).toHaveCSS('color', 'rgb(0, 200, 0)');
   await expect(row.getByRole('button', { name: `Lock page ${property}`, exact: true })).toBeDisabled();
   await row.getByRole('button', { name: `Delete page ${property}`, exact: true }).click();
   await expect(row).toHaveCount(0);

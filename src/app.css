@@ -91,12 +91,13 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2
 .css-value-input { width: 100%; min-width: 45px; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; }
 .css-declaration dd { display: flex; flex-wrap: wrap; align-items: baseline; }
 .css-declaration dd > .css-value-input { flex: 1; width: 0; }
-.css-declaration .css-edited { color: green; }
+.css-declaration .css-edited { color: #00c800; }
 .declaration-controls .css-remove-edit { width: auto; min-width: 30px; padding: 0 4px; }
 .declaration-controls button:disabled { cursor: default; }
 .css-add-button, .css-add-form button { border: 1px solid #465266; border-radius: 3px; background: #26303e; color: #b3c4d5; font: inherit; padding: 0 6px; }
 .css-add-button { margin: 3px 8px 3px 12px; }
-.css-add-form { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 8px 12px; }
+.css-add-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .7fr) auto auto; align-items: center; gap: 4px; margin: 8px 0 8px 12px; }
+.css-add-form .css-edit-error { grid-column: 1 / -1; }
 .css-add-form input { width: 100%; min-width: 0; background: #202a38; border: 1px solid #465266; color: #dce1e9; padding: 4px; font: inherit; }
 .css-edit-error { display: block; flex-basis: 100%; color: #f1b2a6; font: 10px/1.5 'Segoe UI', sans-serif; }
 .generation-slot { flex-shrink: 0; min-height: 135px; padding: 10px 4px; margin-bottom: 8px; border: 1px dashed #657287; border-radius: 6px; font-size: 10px; overflow-wrap: anywhere; }
